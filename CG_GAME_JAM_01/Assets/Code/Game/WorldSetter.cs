@@ -142,7 +142,7 @@ public class WorldSetter : MonoBehaviour
         }
     }
 
-    enum CubeAreaEnum : uint
+    public enum CubeAreaEnum : uint
     {
         XP = 0,
         XM,
