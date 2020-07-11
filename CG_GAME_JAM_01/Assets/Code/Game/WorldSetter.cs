@@ -61,14 +61,45 @@ public class WorldSetter : MonoBehaviour
 
         NONE
     }
-    private Bounds[] m_cubeAreaBound = new Bounds[(uint)CubeAreaEnum.NONE];
+
+    private CubeAreaEnum[,,] m_areaEnumLUT = new CubeAreaEnum[3, 3, 3];
+
+    /*
+     * @brief : input은 각 axis에대해 -1, 0, 1이고, 그에 따라 CubeAreaEnum을 던져준다.
+     * @details : ex) (1, 0, -1)은 XP_ZM을, (1, 1, -1)은 XP_YP_ZM을 던져준다.
+     */
+    private CubeAreaEnum GetCubeAreaEnum(int x, int y, int z)
+    {
+        return m_areaEnumLUT[x + 1, y + 1, z + 1];
+    }
+
     public CubeAreaEnum GetCubeAreaEnum(Vector3 WorldPosition)
     {
-        CubeAreaEnum r = CubeAreaEnum.NONE;
         Vector3 cubeWorldPos = m_cubeWorldTransform.position;
-        Vector3 cubeWorldScale = m_cubeWorldTransform.lossyScale;
+        Vector3 cubeWorldExtent = m_cubeWorldTransform.lossyScale / 2f;
 
-        return r;
+        Vector3 cubeWorldMin = cubeWorldPos - cubeWorldExtent;
+        Vector3 cubeWorldMax = cubeWorldPos + cubeWorldExtent;
+
+        int bx = 0;
+        if (WorldPosition.x > cubeWorldMax.x)
+            bx = 1;
+        else if (WorldPosition.x < cubeWorldMin.x)
+            bx = -1;
+
+        int by = 0;
+        if (WorldPosition.y > cubeWorldMax.y)
+            by = 1;
+        else if (WorldPosition.y < cubeWorldMin.y)
+            by = -1;
+
+        int bz = 0;
+        if (WorldPosition.z > cubeWorldMax.z)
+            bz = 1;
+        else if (WorldPosition.z < cubeWorldMin.z)
+            bz = -1;
+
+        return GetCubeAreaEnum(bx, by, bz);
     }
 
     enum PlaneDirectionEnum : uint
@@ -218,6 +249,42 @@ public class WorldSetter : MonoBehaviour
 
     void initCubeAreaSetting()
     {
+        m_areaEnumLUT[0, 0, 0] = CubeAreaEnum.XM_YM_ZM;
+        m_areaEnumLUT[0, 0, 1] = CubeAreaEnum.XM_YM;
+        m_areaEnumLUT[0, 0, 2] = CubeAreaEnum.XM_YM_ZP;
+
+        m_areaEnumLUT[0, 1, 0] = CubeAreaEnum.XM_ZM;
+        m_areaEnumLUT[0, 1, 1] = CubeAreaEnum.XM;
+        m_areaEnumLUT[0, 1, 2] = CubeAreaEnum.XM_ZP;
+
+        m_areaEnumLUT[0, 2, 0] = CubeAreaEnum.XM_YP_ZM;
+        m_areaEnumLUT[0, 2, 1] = CubeAreaEnum.XM_YP;
+        m_areaEnumLUT[0, 2, 2] = CubeAreaEnum.XM_YP_ZP;
+
+        m_areaEnumLUT[1, 0, 0] = CubeAreaEnum.YM_ZM;
+        m_areaEnumLUT[1, 0, 1] = CubeAreaEnum.YM;
+        m_areaEnumLUT[1, 0, 2] = CubeAreaEnum.YM_ZP;
+
+        m_areaEnumLUT[1, 1, 0] = CubeAreaEnum.ZM;
+        m_areaEnumLUT[1, 1, 1] = CubeAreaEnum.NONE;
+        m_areaEnumLUT[1, 1, 2] = CubeAreaEnum.ZP;
+
+        m_areaEnumLUT[1, 2, 0] = CubeAreaEnum.YP_ZM;
+        m_areaEnumLUT[1, 2, 1] = CubeAreaEnum.YP;
+        m_areaEnumLUT[1, 2, 2] = CubeAreaEnum.YP_ZP;
+
+        m_areaEnumLUT[2, 0, 0] = CubeAreaEnum.XP_YM_ZM;
+        m_areaEnumLUT[2, 0, 1] = CubeAreaEnum.XP_YM;
+        m_areaEnumLUT[2, 0, 2] = CubeAreaEnum.XP_YM_ZP;
+
+        m_areaEnumLUT[2, 1, 0] = CubeAreaEnum.XP_ZM;
+        m_areaEnumLUT[2, 1, 1] = CubeAreaEnum.XP;
+        m_areaEnumLUT[2, 1, 2] = CubeAreaEnum.XP_ZP;
+
+        m_areaEnumLUT[2, 2, 0] = CubeAreaEnum.XP_YP_ZM;
+        m_areaEnumLUT[2, 2, 1] = CubeAreaEnum.XP_YP;
+        m_areaEnumLUT[2, 2, 2] = CubeAreaEnum.XP_YP_ZP;
+
         const float cubeAreaAlphaValue = 0.3f;
 
         Material cubeAreaMat = Resources.Load("Prefab/CubeAreaMat") as Material;
@@ -238,8 +305,6 @@ public class WorldSetter : MonoBehaviour
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
-        m_cubeAreaBound[(uint)CubeAreaEnum.XP].center = m_cubeAreaObject[(uint)CubeAreaEnum.XP].transform.position;
-        m_cubeAreaBound[(uint)CubeAreaEnum.XP].size = m_cubeAreaObject[(uint)CubeAreaEnum.XP].transform.lossyScale;
 
         setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM],
             "CubeArea_X-",
