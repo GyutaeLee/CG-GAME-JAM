@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.XR;
 
 public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
@@ -88,6 +85,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         { 
             PointerDownFunction();
         }
+
+        KeyboardDownFunction();
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -117,6 +116,11 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         {
             JoystickVerticalValue = (handle.sizeDelta.y * 2 / background.sizeDelta.y) * (handle.anchoredPosition.y / handle.sizeDelta.y);
         }
+    }
+
+    public virtual void KeyboardDownFunction()
+    {
+
     }
 
     public virtual void PointerDownFunction()
