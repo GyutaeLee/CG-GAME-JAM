@@ -7,7 +7,8 @@ using UnityEngine;
  */
 public class WorldSetter : MonoBehaviour
 {
-    Light[] m_cubeLights = new Light[6];
+    Transform m_worldSetterTransform;
+
     Transform m_cubeWorldTransform;
     GameObject m_cubeWorldGameObject;
 
@@ -16,7 +17,6 @@ public class WorldSetter : MonoBehaviour
         IN = 0,
         OUT = 1
     }
-
 
     enum WorldAreaEnum : uint
     {
@@ -31,12 +31,20 @@ public class WorldSetter : MonoBehaviour
     Quaternion[] m_planeRot = new Quaternion[12];
     GameObject[] m_prefabPlaneArea = new GameObject[12];
     Color[] m_planeColor = new Color[12];
+
+    GameObject[] m_worldLight = new GameObject[6];
      
     // Start is called before the first frame update
     void Start()
     {
+        GameObject emptyGameObject = Resources.Load("Prefab/GameObject") as GameObject;
+
+        m_worldSetterTransform = GetComponent<Transform>();
+
         m_cubeWorldTransform = transform.Find("CubeWorld");
         m_cubeWorldGameObject = m_cubeWorldTransform.gameObject;
+
+        
 
         // plane pos and rot init for debugging
         const float posMove = 1f;
@@ -88,13 +96,16 @@ public class WorldSetter : MonoBehaviour
         m_planeRelativePos[(uint)WorldAreaEnum.ZMINUS + 1] = new Vector3(0f, 0f, -posMove);
         m_planeRot[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(90f, 0f, 0f);
         m_planeColor[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 0f, 1f, planeAlphaValue);
-
+        
         Material planeMat = Resources.Load("Prefab/PlaneTransparency") as Material;
         GameObject prefab = Resources.Load("Prefab/pAreaPlane") as GameObject;
+
+        GameObject planeParent = GameObject.Instantiate(emptyGameObject, m_cubeWorldTransform);
+        planeParent.name = "PlaneParent";
+        Transform planeParentTransform = planeParent.transform;
         for (int i = 0; i < 12; ++i)
         {
-            m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, m_cubeWorldTransform);
-
+            m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, planeParentTransform);
 
             // Basic Setting
             WorldAreaEnum ew = ((i % 2) == 0 ? (WorldAreaEnum)i: (WorldAreaEnum)(i - 1));
@@ -107,6 +118,31 @@ public class WorldSetter : MonoBehaviour
             MeshRenderer mr = m_prefabPlaneArea[i].GetComponent<MeshRenderer>();
             mr.material = Material.Instantiate(planeMat);
             mr.material.SetColor("_Color", m_planeColor[i]);
+        }
+
+        // Lighting Setting
+        
+
+        Quaternion[] lightRot = new Quaternion[6];
+        lightRot[0] = Quaternion.Euler(0f, -90f, 0f);    // X+
+        lightRot[1] = Quaternion.Euler(0f, 90f, 0f);   // X-
+        lightRot[2] = Quaternion.Euler(90f, 0f, 0f);   // Y+
+        lightRot[3] = Quaternion.Euler(-90f, 0f, 0f);    // Y-
+        lightRot[4] = Quaternion.Euler(180f, 0f, 0f);   // Z+
+        lightRot[5] = Quaternion.Euler(0f, 0f, 0f);     // Z-
+
+        for (int i = 0; i < 6; ++i)
+        {
+            Vector3 lPos = m_planeRelativePos[i * 2] * 500f; 
+            m_worldLight[i] = GameObject.Instantiate(emptyGameObject, lPos, lightRot[i], m_worldSetterTransform);
+
+            WorldAreaEnum ew = (WorldAreaEnum)(i * 2);
+            m_worldLight[i].name = ew.ToString() + "_Light";
+
+            Light light = m_worldLight[i].AddComponent<Light>();
+            light.type = LightType.Directional;
+            light.intensity = 1f;
+            light.shadows = LightShadows.None;
         }
     }
 
