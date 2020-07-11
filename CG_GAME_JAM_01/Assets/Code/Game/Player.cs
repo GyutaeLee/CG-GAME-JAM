@@ -57,6 +57,9 @@ public class Player : MonoBehaviour
 
     private void InitializePlayer()
     {
+        int cgPlayerLayer = LayerMask.NameToLayer("CGPlayer");
+        gameObject.layer = cgPlayerLayer;
+
         SetDirectionVectors();
 
         m_PlayerUpVector = PlayerObject.transform.up;

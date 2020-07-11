@@ -56,13 +56,11 @@ Vector3[,] m_directionVector = new Vector3[(uint)CubeAreaEnum.None, (uint)CubeAr
 
 현재 우리는 Player가 자신의 Area를 빠져나가지 못하게, Plane에 대해 BoxCollider를 사용하여 막고 있다. 하지만 이것을 그대로 둔다면, 사용자가 던지는 Movable Object는 여기에 막힐 것이다. 따라서, Layer를 설정하여 Movable Object들은 이 Plane들과 충돌탐지를 하지 않도록 설정할 것이다. Layer들은 다음과 같이 구분된다.
 
-* CGObject_UnMovable
-  * 여기에는 Player/Decoration Object/House 등이 포함된다.
-* CGObject_Movable
-  * 여기에는 플레이어가 던질 수 있는 Object가 포함된다.
-* CGWorld_PlayerBarrier
-  * 플레이어가 나가지 못하게 하는 Plane들이다.
-* CGWorld
-  * 플레이어가 서있는 Cube이다.
+* CGWorldBarrier
+  * 사용자가 나가지 못하게 하는 Barrier
+* CGPlayer
+  * 사용자
+* CGObject 
+  * 그 이외의 Movable/UnMovable CGObject
 
-우리는 현재 CGObject_Movable과 CGWorld_PlayerBarrier사이의 충돌 탐지를 하지 않아야 한다. 그 외에는 다른 Layer들은 모두 충돌탐지를 한다.
+여기에서 CGWorldBarrier와 CGObject사이의 Collision Detection만을 꺼놓는다.

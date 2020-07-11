@@ -5448,7 +5448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlaneDebuggingEnable: 1
   PlaneDebuggingDisplayEnable: 0
-  CubeAreaDebuggingEnable: 1
+  CubeAreaDebuggingEnable: 0
 --- !u!65 &271981293
 BoxCollider:
   m_ObjectHideFlags: 0
