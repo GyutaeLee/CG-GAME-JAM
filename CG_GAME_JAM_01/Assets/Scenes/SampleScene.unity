@@ -12572,7 +12572,7 @@ GameObject:
   - component: {fileID: 1168888831}
   - component: {fileID: 1168888834}
   m_Layer: 0
-  m_Name: House
+  m_Name: Home
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12683,6 +12683,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+  HomeHP: 100
 --- !u!1001 &1169335556
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -41439,6 +41440,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+  HomeHP: 100
 --- !u!64 &3039794349092084645
 MeshCollider:
   m_ObjectHideFlags: 0
