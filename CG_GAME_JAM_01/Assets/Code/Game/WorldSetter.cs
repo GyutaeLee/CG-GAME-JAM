@@ -8,6 +8,7 @@ using UnityEngine;
 public class WorldSetter : MonoBehaviour
 {
     public bool PlaneDebuggingEnable = true;
+    public bool PlaneDebuggingDisplayEnable = true;
     public bool CubeAreaDebuggingEnable = true;
 
     GameObject m_emptyGameObjectPrefab;
@@ -99,6 +100,7 @@ public class WorldSetter : MonoBehaviour
         for (int i = 0; i < 12; ++i)
         {
             m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, planeParentTransform);
+            m_prefabPlaneArea[i].GetComponent<Renderer>().enabled = PlaneDebuggingDisplayEnable;
 
             // Basic Setting
             WorldAreaEnum ew = ((i % 2) == 0 ? (WorldAreaEnum)i : (WorldAreaEnum)(i - 1));
@@ -111,6 +113,12 @@ public class WorldSetter : MonoBehaviour
             MeshRenderer mr = m_prefabPlaneArea[i].GetComponent<MeshRenderer>();
             mr.material = Material.Instantiate(planeMat);
             mr.material.SetColor("_Color", m_planeColor[i]);
+
+            // Plane Collider Setting for preventing from a character moving to another cube face
+            Rigidbody rb = m_prefabPlaneArea[i].AddComponent<Rigidbody>();
+            rb.mass = 100f;
+            rb.isKinematic = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
         planeParent.SetActive(PlaneDebuggingEnable);
     }
