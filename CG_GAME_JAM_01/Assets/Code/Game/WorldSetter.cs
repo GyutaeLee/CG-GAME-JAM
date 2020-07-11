@@ -7,16 +7,69 @@ using UnityEngine;
  */
 public class WorldSetter : MonoBehaviour
 {
+    private GameObject m_emptyGameObjectPrefab;
+
+    private Transform m_worldSetterTransform;
+
+    private Transform m_cubeWorldTransform;
+    private GameObject m_cubeWorldGameObject;
+
+    // GUI
     public bool PlaneDebuggingEnable = true;
     public bool PlaneDebuggingDisplayEnable = true;
     public bool CubeAreaDebuggingEnable = true;
+    // GUI
 
-    GameObject m_emptyGameObjectPrefab;
+    public enum CubeAreaEnum : uint
+    {
+        XP = 0,     // (1, 0, 0)
+        XM,         // (-1, 0, 0)
+        YP,         // (0, 1, 0)
+        YM,
+        ZP,
+        ZM,
 
-    Transform m_worldSetterTransform;
+        XP_YP,
+        XP_YM,
 
-    Transform m_cubeWorldTransform;
-    GameObject m_cubeWorldGameObject;
+        XM_YP,
+        XM_YM,
+
+        XP_ZP,
+        XP_ZM,
+
+        XM_ZP,
+        XM_ZM,
+
+        YP_ZP,
+        YP_ZM,
+
+        YM_ZP,
+        YM_ZM,
+
+        XP_YP_ZP,
+        XP_YP_ZM,
+
+        XP_YM_ZP,
+        XP_YM_ZM,
+
+        XM_YP_ZP,
+        XM_YP_ZM,
+
+        XM_YM_ZP,
+        XM_YM_ZM,
+
+        NONE
+    }
+    private Bounds[] m_cubeAreaBound = new Bounds[(uint)CubeAreaEnum.NONE];
+    public CubeAreaEnum GetCubeAreaEnum(Vector3 WorldPosition)
+    {
+        CubeAreaEnum r = CubeAreaEnum.NONE;
+        Vector3 cubeWorldPos = m_cubeWorldTransform.position;
+        Vector3 cubeWorldScale = m_cubeWorldTransform.lossyScale;
+
+        return r;
+    }
 
     enum PlaneDirectionEnum : uint
     {
@@ -150,45 +203,6 @@ public class WorldSetter : MonoBehaviour
         }
     }
 
-    enum CubeAreaEnum : uint
-    {
-        XP = 0,
-        XM,
-        YP,
-        YM,
-        ZP,
-        ZM,
-
-        XP_YP,
-        XP_YM,
-
-        XM_YP,
-        XM_YM,
-
-        XP_ZP,
-        XP_ZM,
-
-        XM_ZP,
-        XM_ZM,
-
-        YP_ZP,
-        YP_ZM,
-
-        YM_ZP,
-        YM_ZM,
-
-        XP_YP_ZP,
-        XP_YP_ZM,
-
-        XP_YM_ZP,
-        XP_YM_ZM,
-
-        XM_YP_ZP,
-        XM_YP_ZM,
-
-        XM_YM_ZP,
-        XM_YM_ZM
-    }
     GameObject m_cubeAreaParent;
     GameObject[] m_cubeAreaObject = new GameObject[26];
     void setCubeAreaGameObject(ref GameObject go, string goName, Vector3 pos, Vector3 scale, ref Material resourceMat, Color colour)
@@ -224,6 +238,9 @@ public class WorldSetter : MonoBehaviour
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
+        m_cubeAreaBound[(uint)CubeAreaEnum.XP].center = m_cubeAreaObject[(uint)CubeAreaEnum.XP].transform.position;
+        m_cubeAreaBound[(uint)CubeAreaEnum.XP].size = m_cubeAreaObject[(uint)CubeAreaEnum.XP].transform.lossyScale;
+
         setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM],
             "CubeArea_X-",
             new Vector3(-1f, 0f, 0f),
