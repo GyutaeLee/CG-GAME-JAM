@@ -30,6 +30,7 @@ public class GuiPlayerMoveController : Joystick
             horizontalValue = -1.0f;
         }
 
+        _Player.RotatePlayerObject(horizontalValue, verticalValue);
         _Player.MovePlayerObject(horizontalValue, verticalValue);
 #endif
     }
@@ -38,6 +39,7 @@ public class GuiPlayerMoveController : Joystick
     {
         base.PointerDownFunction();
 
+        _Player.RotatePlayerObject(JoystickHorizontalValue, JoystickVerticalValue);
         _Player.MovePlayerObject(JoystickHorizontalValue, JoystickVerticalValue);
     }
 }

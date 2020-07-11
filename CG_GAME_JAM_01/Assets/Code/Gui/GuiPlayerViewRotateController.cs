@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GuiPlayerRotateController : Joystick
+public class GuiPlayerViewRotateController : Joystick
 {
     public Player _Player;
     public MainCamera _FirstPersonViewCamera;
