@@ -13,9 +13,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - CGObject
+  - CGPlayer
+  - CGWorldBarrier
   - 
   - 
   - 

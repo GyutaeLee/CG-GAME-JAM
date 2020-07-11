@@ -181,10 +181,13 @@ public class WorldSetter : MonoBehaviour
         GameObject planeParent = GameObject.Instantiate(m_emptyGameObjectPrefab, m_cubeWorldTransform);
         planeParent.name = "PlaneParent";
         Transform planeParentTransform = planeParent.transform;
+
+        int worldBarrierLayerIndex = LayerMask.NameToLayer("CGWorldBarrier");
         for (int i = 0; i < 12; ++i)
         {
             m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, planeParentTransform);
             m_prefabPlaneArea[i].GetComponent<Renderer>().enabled = PlaneDebuggingDisplayEnable;
+            m_prefabPlaneArea[i].layer = worldBarrierLayerIndex;
 
             // Basic Setting
             WorldAreaEnum ew = ((i % 2) == 0 ? (WorldAreaEnum)i : (WorldAreaEnum)(i - 1));

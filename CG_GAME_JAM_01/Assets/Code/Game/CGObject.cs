@@ -44,4 +44,11 @@ public class CGObject : MonoBehaviour
 
         return isPickable;
     }
+
+    private void Start()
+    {
+        // Set layer
+        int cgObjectLayerIndex = LayerMask.NameToLayer("CGObject");
+        gameObject.layer = cgObjectLayerIndex;
+    }
 }
