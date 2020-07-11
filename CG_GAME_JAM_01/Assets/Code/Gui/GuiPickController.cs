@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
+    public Player _Player;
+
     public bool IsPointerDown
     {
         get { return isPointerDown; }
@@ -23,7 +25,17 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     public virtual void OnPointerUp(PointerEventData eventData)
     {
-        Debug.Log("GYUT TEST : 들어 올리는 코드 추가");
+        Transform objectTransform = null;
+
+        if (_Player.ShotRayCastToForward(out objectTransform) == true)
+        {
+            _Player.PickUpObject(objectTransform);
+        }
+        //?? 규태 : 테스트 코드
+        else if (_Player.PlayerState == Player.EPlayerState.PLAYER_STATE_PICK)
+        {
+            _Player.ThrowObject(1.0f);
+        }        
 
         InitializePointerData();
     }
