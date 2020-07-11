@@ -204,8 +204,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18cf0e203d0d8b44f9bd9c06188ea6f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlaneDebuggingEnable: 0
-  CubeAreaDebuggingEnable: 1
+  PlaneDebuggingEnable: 1
+  PlaneDebuggingDisplayEnable: 0
+  CubeAreaDebuggingEnable: 0
 --- !u!4 &236944744
 Transform:
   m_ObjectHideFlags: 0
