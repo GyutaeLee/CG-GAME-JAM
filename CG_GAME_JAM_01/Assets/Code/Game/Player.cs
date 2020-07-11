@@ -173,7 +173,7 @@ public class Player : MonoBehaviour
             Transform hitTransform = m_RaycastHit.transform;
 
             // 1. EObjectType이 MOVABLE인지 확인한다.
-            if (hitTransform.GetComponent<CGObject>().IsMovable() == false)
+            if (hitTransform.GetComponent<CGObject>().IsMovable == false)
             {
                 objectTransform = null;
                 return false;

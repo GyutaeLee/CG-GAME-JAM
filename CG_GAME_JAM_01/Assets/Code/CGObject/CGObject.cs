@@ -4,15 +4,6 @@ using UnityEngine;
 
 public class CGObject : MonoBehaviour
 {
-    public enum EObjectType
-    { 
-        OBJECT_TYPE_NONE    = 0,
-        OBJECT_TYPE_MOVABLE,
-        OBJECT_TYPE_UNMOVABLE,
-
-        MAX_OBJECT_TYPE
-    }
-
     public enum EObjectState
     {
         OBJECT_STATE_NONE   = 0,
@@ -24,28 +15,27 @@ public class CGObject : MonoBehaviour
         MAX_OBJECT_STATE
     }
 
-    public EObjectType ObjectType;
+    public bool IsMovable;
     public EObjectState ObjectState;
-
-    public bool IsMovable()
-    {
-        bool isMovable = false;
-
-        isMovable = (ObjectType == EObjectType.OBJECT_TYPE_MOVABLE);
-
-        return isMovable;
-    }
 
     public bool IsPickable()
     {
         bool isPickable = false;
 
-        isPickable = (ObjectState == EObjectState.OBJECT_STATE_GROUND);
+        if (ObjectState == EObjectState.OBJECT_STATE_GROUND && IsMovable == true)
+        {
+            isPickable = true;
+        }
 
         return isPickable;
     }
 
     private void Start()
+    {
+        InitializeCGObject();
+    }
+
+    private void InitializeCGObject()
     {
         // Set layer
         int cgObjectLayerIndex = LayerMask.NameToLayer("CGObject");
