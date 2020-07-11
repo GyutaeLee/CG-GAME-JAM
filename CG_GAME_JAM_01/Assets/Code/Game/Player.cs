@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     {
         PLAYER_STATE_NONE   = 0,
         PLAYER_STATE_IDLE,
+
+        PLAYER_STATE_READY,
         PLAYER_STATE_PICK,
         PLAYER_STATE_THROW,
 
@@ -66,8 +68,6 @@ public class Player : MonoBehaviour
         m_OriginQuaternion = PlayerObject.transform.localRotation;
 
         m_PlayerHeight = PlayerObject.transform.GetComponent<CapsuleCollider>().height;
-
-        m_PlayerState = EPlayerState.PLAYER_STATE_IDLE;
     }
 
     private void SetDirectionVectors()
@@ -121,6 +121,23 @@ public class Player : MonoBehaviour
     }
 
     /*
+     * 
+     */
+
+    public void SetPlayerIdle()
+    {
+        PlayerState = Player.EPlayerState.PLAYER_STATE_IDLE;
+
+        // 들고 있다가 턴이 끝났을 때
+        if (m_PickUpObject != null)
+        {
+            m_PickUpObject.transform.parent = null;
+            m_PickUpObject.GetComponent<CGObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_GROUND;
+
+        }
+    }
+
+    /*
      *  PLAYER CONTROL
      */
     public void MovePlayerObject(float horizontalValue, float verticalValue)    
@@ -128,8 +145,8 @@ public class Player : MonoBehaviour
         if (horizontalValue == 0 && verticalValue == 0)
             return;
 
-        float horizontalSpeed = horizontalValue * playerMoveSpeed;
-        float verticalSpeed   = verticalValue * playerMoveSpeed;
+        float horizontalSpeed = horizontalValue * playerMoveSpeed * Time.deltaTime;
+        float verticalSpeed   = verticalValue * playerMoveSpeed * Time.deltaTime;
         Vector3 moveVector = Vector3.zero;
 
         moveVector += m_MoveRightVectors[(int)_GameManager.PlayerCubeAreaEnum] * horizontalSpeed;
@@ -196,7 +213,7 @@ public class Player : MonoBehaviour
 
     public bool PickUpObject(Transform objectTransform)
     {
-        if (m_PlayerState != EPlayerState.PLAYER_STATE_IDLE)
+        if (m_PlayerState != EPlayerState.PLAYER_STATE_READY)
         {
             return false;
         }
@@ -220,11 +237,19 @@ public class Player : MonoBehaviour
         playerThrowVector = (PlayerObject.transform.up + PlayerObject.transform.forward).normalized;
 
         m_PlayerState = EPlayerState.PLAYER_STATE_THROW;
+        m_PickUpObject = null;
+
+        _GameManager.SetGameStateThrowing();
+
+        //?? 규태 : 테스트
+        FinishThrowObject();
     }
 
     public void FinishThrowObject()
     {
-        m_PlayerState = EPlayerState.PLAYER_STATE_IDLE;
+        m_PlayerState = EPlayerState.PLAYER_STATE_READY;
+
+        _GameManager.SetGameTurnOver();
     }
 }
 

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class CGThrowableObject : CGObject
 {
-    private Transform m_OriginTransform;
+    private Vector3 m_OriginLocalPosition;
+    private Quaternion m_OriginLocalRotation;
+    private Vector3 m_OriginLocalScale;
 
     private void Start()
     {
@@ -15,14 +17,16 @@ public class CGThrowableObject : CGObject
     {
         IsMovable = true;
 
-        m_OriginTransform = transform;
+        m_OriginLocalPosition = transform.localPosition;
+        m_OriginLocalRotation = transform.localRotation;
+        m_OriginLocalScale = transform.localScale;
     }
 
     public void ResetObject()
     {
-        transform.position = m_OriginTransform.position;
-        transform.rotation = m_OriginTransform.rotation;
-        transform.localScale = m_OriginTransform.localScale;
+        transform.localPosition = m_OriginLocalPosition;
+        transform.localRotation = m_OriginLocalRotation;
+        transform.localScale = m_OriginLocalScale;
 
         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
