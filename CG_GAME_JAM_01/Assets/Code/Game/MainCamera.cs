@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class MainCamera : MonoBehaviour
 {
-    public GameObject Cameraobject;
+    public GameObject CameraObject;
     public Camera _Camera;
 
-    public void RotateCameraCenteredOnMap(float horizontalValue, float verticalValue)
+    public Transform cameraOriginTransform;
+    public float cameraMoveSpeed = 1.0f;
+    public float cameraRotateSpeed = 0.1f;
+
+    private void Start()
     {
-        //?? 규태 : 로테이션 만들기
-        Debug.Log("GYUT TEST - ROTATE CAM : " + horizontalValue + " " + verticalValue);
+        InitializeMainCamera();
+    }
+
+    private void InitializeMainCamera()
+    {
+        cameraOriginTransform = CameraObject.transform;
     }
 }

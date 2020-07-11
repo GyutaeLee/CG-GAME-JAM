@@ -36,6 +36,8 @@ public class GuiPlayerMoveController : Joystick
 
     public override void PointerDownFunction()
     {
+        base.PointerDownFunction();
+
         _Player.MovePlayerObject(JoystickHorizontalValue, JoystickVerticalValue);
     }
 }
