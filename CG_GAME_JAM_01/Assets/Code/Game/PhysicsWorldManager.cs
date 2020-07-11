@@ -4,22 +4,181 @@ using UnityEngine;
 
 public class PhysicsWorldManager : MonoBehaviour
 {
-    List<CGObject> m_cgObjects;
-    public void LaunchCGObject(CGObject obj)
+    const float kLaunchPower = 3f;
+    private WorldSetter m_worldSetter;
+    private struct CGPhysicsObject
     {
-        m_cgObjects.Add(obj);
+        public enum EObjectState
+        {
+            OBJECT_LAUNCH_TRIGGER,
+            OBJECT_MOVING,
+            OBJECT_TARGET_AREA
+        }
+
+        public CGPhysicsObject(CGThrowableObject o, Vector3 d, float p, WorldSetter ws)
+        {
+            WorldSetter.CubeAreaEnum ae = ws.GetCubeAreaEnum(o.transform.position);
+
+            previousArea = ae;
+            currentArea = ae;
+            targetArea = WorldSetter.CubeAreaEnum.NONE;
+            isAreaChanged = false;
+            state = EObjectState.OBJECT_LAUNCH_TRIGGER;
+            obj = o;
+            rb = obj.GetComponent<Rigidbody>();
+            direction = d;
+            power = p;
+        }
+
+        public WorldSetter.CubeAreaEnum previousArea;
+        public WorldSetter.CubeAreaEnum currentArea;
+        public WorldSetter.CubeAreaEnum targetArea;
+        public bool isAreaChanged;
+        public EObjectState state;
+        public CGThrowableObject obj;
+        public Rigidbody rb;
+        public Vector3 direction;
+        public float power;
     }
 
+    List<CGPhysicsObject> m_objects;
+    public void LaunchCGObject(CGThrowableObject obj, Vector3 direction, float power)
+    {
+        CGPhysicsObject a = new CGPhysicsObject(obj, direction, power, m_worldSetter);
+        m_objects.Add(a);
+    }
 
-    // Start is called before the first frame update
+    bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
+    const float kForceSpacePower = 10f;
+    Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
+    WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
+
+    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target )
+    {
+        m_canAreaChange[(uint)from, (uint)to] = true;
+        m_forceSpace[(uint)from, (uint)to] = force;
+        m_targetArea[(uint)from, (uint)to] = target;
+    }
+
     void Start()
     {
-        
+        m_worldSetter = GameObject.Find("Cube").GetComponent<WorldSetter>();
+
+        // 초기화
+        for (int i = 0; i < (uint)WorldSetter.CubeAreaEnum.NONE; ++i)
+        {
+            for (int j = 0; j < (uint)WorldSetter.CubeAreaEnum.NONE; ++j)
+            {
+                m_canAreaChange[i, j] = false;
+                m_forceSpace[i, j] = new Vector3(0f, 0f, 0f);
+                m_targetArea[i, j] = WorldSetter.CubeAreaEnum.NONE;
+            }
+        }
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_YP, Vector3.left, WorldSetter.CubeAreaEnum.YP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_YM, Vector3.left, WorldSetter.CubeAreaEnum.YM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_ZP, Vector3.left, WorldSetter.CubeAreaEnum.ZP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_ZM, Vector3.left, WorldSetter.CubeAreaEnum.ZM);
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_YP, Vector3.right, WorldSetter.CubeAreaEnum.YP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_YM, Vector3.right, WorldSetter.CubeAreaEnum.YM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_ZP, Vector3.right, WorldSetter.CubeAreaEnum.ZP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_ZM, Vector3.right, WorldSetter.CubeAreaEnum.ZM);
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.XP_YP, Vector3.down, WorldSetter.CubeAreaEnum.XP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.XM_YP, Vector3.down, WorldSetter.CubeAreaEnum.XM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.YP_ZP, Vector3.down, WorldSetter.CubeAreaEnum.ZP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.YP_ZM, Vector3.down, WorldSetter.CubeAreaEnum.ZM);
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.XP_YM, Vector3.up, WorldSetter.CubeAreaEnum.XP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.XM_YM, Vector3.up, WorldSetter.CubeAreaEnum.XM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.YM_ZP, Vector3.up, WorldSetter.CubeAreaEnum.ZP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.YM_ZM, Vector3.up, WorldSetter.CubeAreaEnum.ZM);
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.XP_ZP, Vector3.back, WorldSetter.CubeAreaEnum.XP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.XM_ZP, Vector3.back, WorldSetter.CubeAreaEnum.XM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.YP_ZP, Vector3.back, WorldSetter.CubeAreaEnum.YP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.YM_ZP, Vector3.back, WorldSetter.CubeAreaEnum.YM);
+
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.XP_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.XP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.XM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.XM);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YP_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YP);
+        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YM);
+    }
+
+    private void FixedUpdate()
+    {
+        for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
+        {
+            CGPhysicsObject po = m_objects[objectIndex];
+
+            switch (po.state)
+            {
+                case CGPhysicsObject.EObjectState.OBJECT_LAUNCH_TRIGGER:
+                    {
+                        Vector3 launchForce = po.direction * po.power * kLaunchPower;
+                        po.rb.AddForce(launchForce);
+                        po.state = CGPhysicsObject.EObjectState.OBJECT_MOVING;
+                        break;
+                    }
+                case CGPhysicsObject.EObjectState.OBJECT_MOVING:
+                    {
+                        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(po.obj.transform.position);
+
+                        // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
+                        // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
+                        if (po.isAreaChanged == true)
+                        {
+                            if(po.targetArea == ae)
+                            {
+                                po.state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
+                            }
+
+                            continue;
+                        }
+
+                        if (po.currentArea != ae)
+                        {
+                            po.isAreaChanged = true;
+                            po.previousArea = po.currentArea;
+                            po.currentArea = ae;
+                            po.targetArea = m_targetArea[(uint)po.previousArea, (uint)po.currentArea];
+
+                            if(m_canAreaChange[(uint)po.previousArea, (uint)po.currentArea] == true)
+                            {
+                                po.rb.AddForce(m_forceSpace[(uint)po.previousArea, (uint)po.currentArea] * kForceSpacePower);
+                            }
+                            else
+                            {
+                                // PutBack the Throwable Object
+                                po.obj.ResetObject();
+                            }
+                        }
+
+                        break;
+                    }
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
+        {
+            CGPhysicsObject po = m_objects[objectIndex];
+
+            switch (po.state)
+            {
+                case CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA:
+                {
+                    // 해당 area에 맞는 gravity 설정
+
+                    // 업데이트 할 PhysicsObject Array에서 제거
+                    m_objects.RemoveAt(objectIndex);
+                    break;
+                }
+            }
+        }
     }
 }
