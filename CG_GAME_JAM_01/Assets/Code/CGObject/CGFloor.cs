@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class CGFloor : CGObject
 {
-    void Start()
+    public override void InitializeCGObject()
     {
-        InitializeCGFloor();
-    }
+        base.InitializeCGObject();
 
-    private void InitializeCGFloor()
-    {
         IsMovable = false;
     }
 }

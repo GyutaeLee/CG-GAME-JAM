@@ -6,13 +6,10 @@ public class CGHome : CGObject
 {
     public int HomeHP = 100;
 
-    void Start()
+    public override void InitializeCGObject()
     {
-        InitializeCGHome();
-    }
+        base.InitializeCGObject();
 
-    private void InitializeCGHome()
-    {
         IsMovable = false;
     }
 

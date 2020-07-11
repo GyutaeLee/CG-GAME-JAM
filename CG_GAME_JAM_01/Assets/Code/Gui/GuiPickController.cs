@@ -15,6 +15,16 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     [SerializeField] private bool isPointerDown;
 
+    private void Start()
+    {
+        
+    }
+
+    private void InitializePickController()
+    {
+        
+    }
+
     /*
      *  VIRTUAL
      */

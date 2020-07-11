@@ -24,6 +24,10 @@ public class Player : MonoBehaviour
     }
 
     public GameManager _GameManager;
+
+    private PhysicsWorldManager PWManager;
+
+
     public GameObject PlayerObject;
     public Rigidbody PlayerRigidbody;
 
@@ -63,6 +67,8 @@ public class Player : MonoBehaviour
         gameObject.layer = cgPlayerLayer;
 
         SetDirectionVectors();
+
+        PWManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
 
         m_PlayerUpVector = PlayerObject.transform.up;
         m_OriginQuaternion = PlayerObject.transform.localRotation;
@@ -131,7 +137,6 @@ public class Player : MonoBehaviour
         // 들고 있다가 턴이 끝났을 때
         if (m_PickUpObject != null)
         {
-            m_PickUpObject.transform.parent = null;
             m_PickUpObject.GetComponent<CGObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_GROUND;
 
         }
@@ -183,6 +188,7 @@ public class Player : MonoBehaviour
     /*
      * PHYSICS
      */
+    //?? 규태 : 함수 일관성 변경
     public bool ShotRayCastToForward(out Transform objectTransform)
     {
         if (Physics.Raycast(m_PlayerRayVector, PlayerObject.transform.forward, out m_RaycastHit, m_MaxRaycastDistance))
@@ -190,14 +196,14 @@ public class Player : MonoBehaviour
             Transform hitTransform = m_RaycastHit.transform;
 
             // 1. EObjectType이 MOVABLE인지 확인한다.
-            if (hitTransform.GetComponent<CGObject>().IsMovable == false)
+            if (hitTransform.GetComponent<CGThrowableObject>().IsMovable == false)
             {
                 objectTransform = null;
                 return false;
             }
 
             // 2. EObjectState가 OBJECT_STATE_GROUND인지 확인한다.
-            if (hitTransform.GetComponent<CGObject>().IsPickable() == false)
+            if (hitTransform.GetComponent<CGThrowableObject>().IsPickable() == false)
             {
                 objectTransform = null;
                 return false;
@@ -219,7 +225,7 @@ public class Player : MonoBehaviour
         }
 
         // 3. 물체를 집는다.
-        objectTransform.GetComponent<CGObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_PICKED;
+        objectTransform.GetComponent<CGThrowableObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_PICKED;
 
         // 4. 물체를 플레이어 우측 팔 부근으로 이동시킨다. + 자식 오브젝트로 붙인다. (흔들거리는 효과)
         objectTransform.parent = PlayerObject.transform;
@@ -236,19 +242,26 @@ public class Player : MonoBehaviour
 
         playerThrowVector = (PlayerObject.transform.up + PlayerObject.transform.forward).normalized;
 
+        m_PickUpObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        m_PickUpObject.transform.parent = null;
+        PWManager.LaunchCGObject(m_PickUpObject.GetComponent<CGThrowableObject>(), playerThrowVector, throwStrength);
+
         m_PlayerState = EPlayerState.PLAYER_STATE_THROW;
-        m_PickUpObject = null;
 
         _GameManager.SetGameStateThrowing();
 
         //?? 규태 : 테스트
-        FinishThrowObject();
+        m_PlayerState = EPlayerState.PLAYER_STATE_READY;        
+        //FinishThrowObject();
     }
 
     public void FinishThrowObject()
     {
         m_PlayerState = EPlayerState.PLAYER_STATE_READY;
 
+        m_PickUpObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+
+        m_PickUpObject = null;
         _GameManager.SetGameTurnOver();
     }
 }

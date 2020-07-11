@@ -30,12 +30,12 @@ public class CGObject : MonoBehaviour
         return isPickable;
     }
 
-    private void Start()
+    public virtual void Start()
     {
         InitializeCGObject();
     }
 
-    private void InitializeCGObject()
+    public virtual void InitializeCGObject()
     {
         // Set layer
         int cgObjectLayerIndex = LayerMask.NameToLayer("CGObject");

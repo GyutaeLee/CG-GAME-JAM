@@ -8,13 +8,10 @@ public class CGThrowableObject : CGObject
     private Quaternion m_OriginLocalRotation;
     private Vector3 m_OriginLocalScale;
 
-    private void Start()
+    public override void InitializeCGObject()
     {
-        InitializeCGThrowableObject();
-    }
+        base.InitializeCGObject();
 
-    private void InitializeCGThrowableObject()
-    {
         IsMovable = true;
 
         m_OriginLocalPosition = transform.localPosition;

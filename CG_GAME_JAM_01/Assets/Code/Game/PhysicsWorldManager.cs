@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PhysicsWorldManager : MonoBehaviour
 {
-    const float kLaunchPower = 3f;
+    const float kLaunchPower = 100f;
     private WorldSetter m_worldSetter;
-    private struct CGPhysicsObject
+    private class CGPhysicsObject
     {
         public enum EObjectState
         {
@@ -41,7 +41,7 @@ public class PhysicsWorldManager : MonoBehaviour
         public float power;
     }
 
-    List<CGPhysicsObject> m_objects;
+    List<CGPhysicsObject> m_objects = new List<CGPhysicsObject>();
     public void LaunchCGObject(CGThrowableObject obj, Vector3 direction, float power)
     {
         CGPhysicsObject a = new CGPhysicsObject(obj, direction, power, m_worldSetter);
@@ -49,7 +49,7 @@ public class PhysicsWorldManager : MonoBehaviour
     }
 
     bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
-    const float kForceSpacePower = 10f;
+    const float kForceSpacePower = 150f;
     Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
 
@@ -110,48 +110,46 @@ public class PhysicsWorldManager : MonoBehaviour
     {
         for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
         {
-            CGPhysicsObject po = m_objects[objectIndex];
-
-            switch (po.state)
+            switch (m_objects[objectIndex].state)
             {
                 case CGPhysicsObject.EObjectState.OBJECT_LAUNCH_TRIGGER:
                     {
-                        Vector3 launchForce = po.direction * po.power * kLaunchPower;
-                        po.rb.AddForce(launchForce);
-                        po.state = CGPhysicsObject.EObjectState.OBJECT_MOVING;
+                        Vector3 launchForce = m_objects[objectIndex].direction * m_objects[objectIndex].power * kLaunchPower;
+                        m_objects[objectIndex].rb.AddForce(launchForce);
+                        m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_MOVING;
                         break;
                     }
                 case CGPhysicsObject.EObjectState.OBJECT_MOVING:
                     {
-                        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(po.obj.transform.position);
+                        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(m_objects[objectIndex].obj.transform.position);
 
                         // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
                         // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
-                        if (po.isAreaChanged == true)
+                        if (m_objects[objectIndex].isAreaChanged == true)
                         {
-                            if(po.targetArea == ae)
+                            if(m_objects[objectIndex].targetArea == ae)
                             {
-                                po.state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
+                                m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
                             }
 
                             continue;
                         }
 
-                        if (po.currentArea != ae)
+                        if (m_objects[objectIndex].currentArea != ae)
                         {
-                            po.isAreaChanged = true;
-                            po.previousArea = po.currentArea;
-                            po.currentArea = ae;
-                            po.targetArea = m_targetArea[(uint)po.previousArea, (uint)po.currentArea];
+                            m_objects[objectIndex].isAreaChanged = true;
+                            m_objects[objectIndex].previousArea = m_objects[objectIndex].currentArea;
+                            m_objects[objectIndex].currentArea = ae;
+                            m_objects[objectIndex].targetArea = m_targetArea[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea];
 
-                            if(m_canAreaChange[(uint)po.previousArea, (uint)po.currentArea] == true)
+                            if(m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
                             {
-                                po.rb.AddForce(m_forceSpace[(uint)po.previousArea, (uint)po.currentArea] * kForceSpacePower);
+                                m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
                             }
                             else
                             {
                                 // PutBack the Throwable Object
-                                po.obj.ResetObject();
+                                m_objects[objectIndex].obj.ResetObject();
                             }
                         }
 

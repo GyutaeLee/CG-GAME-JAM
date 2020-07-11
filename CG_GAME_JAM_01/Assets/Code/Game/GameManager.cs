@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
         GamePlayerCount = 2;
         GameTurnNumber = 0;
 
-        GameTurnLimitTime = 10.0f;
+        GameTurnLimitTime = 10000.0f;
     }
 
     public void StartGame()
