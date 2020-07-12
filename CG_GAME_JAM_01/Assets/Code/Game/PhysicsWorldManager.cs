@@ -48,12 +48,17 @@ public class PhysicsWorldManager : MonoBehaviour
         m_objects.Add(a);
     }
 
+    public int GetObservedObjectCount()
+    {
+        return m_objects.Count;
+    }
+
     bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     const float kForceSpacePower = 150f;
     Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
 
-    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target )
+    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target)
     {
         m_canAreaChange[(uint)from, (uint)to] = true;
         m_forceSpace[(uint)from, (uint)to] = force;
@@ -127,14 +132,13 @@ public class PhysicsWorldManager : MonoBehaviour
                         Bounds objWorldBound = m_objects[objectIndex].obj.GetComponent<Renderer>().bounds;
                         bool isInside = WorldSetter.IsAInsideB(objWorldBound.min, objWorldBound.max, areaWorldBound.min, areaWorldBound.max);
 
-
                         // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
                         // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
                         if (m_objects[objectIndex].isAreaChanged == true)
                         {
                             // 해당 target area에 넘어왔고, bound box가 완전히 들어왔다면
                             // Layer 설정을 바꾸어서 plane과 충돌처리 되게 한다.
-                            if(m_objects[objectIndex].targetArea == ae && isInside)
+                            if (m_objects[objectIndex].targetArea == ae && isInside)
                             {
                                 m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
                                 m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
@@ -177,18 +181,18 @@ public class PhysicsWorldManager : MonoBehaviour
     {
         for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
         {
-            CGPhysicsObject po = m_objects[objectIndex];
-
-            switch (po.state)
+            switch (m_objects[objectIndex].state)
             {
                 case CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA:
-                {
-                    // 해당 area에 맞는 gravity 설정
-
-                    // 업데이트 할 PhysicsObject Array에서 제거
-                    m_objects.RemoveAt(objectIndex);
-                    break;
-                }
+                    {
+                        // 해당 area에 맞는 gravity 설정
+                        if (m_objects[objectIndex].obj.GetComponent<CGThrowableObject>().CheckAndChangeObjectState() == true)
+                        {
+                            // 업데이트 할 PhysicsObject Array에서 제거
+                            m_objects.RemoveAt(objectIndex);
+                        }
+                        break;
+                    }
             }
         }
     }

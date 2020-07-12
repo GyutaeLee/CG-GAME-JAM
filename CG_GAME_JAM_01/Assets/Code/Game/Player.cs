@@ -130,16 +130,56 @@ public class Player : MonoBehaviour
      * 
      */
 
-    public void SetPlayerIdle()
+    public void SetPlayerStateIdle()
     {
-        PlayerState = Player.EPlayerState.PLAYER_STATE_IDLE;
+        PlayerState = EPlayerState.PLAYER_STATE_IDLE;
 
         // 들고 있다가 턴이 끝났을 때
         if (m_PickUpObject != null)
         {
-            m_PickUpObject.GetComponent<CGObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_GROUND;
-
+            m_PickUpObject.GetComponent<CGThrowableObject>().ResetObject();
+            m_PickUpObject.transform.parent = null;
+            m_PickUpObject = null;
         }
+    }
+
+    public void SetPlayerStateReady()
+    {
+        PlayerState = EPlayerState.PLAYER_STATE_READY;
+        m_PickUpObject = null;
+    }
+
+    public void SetPlayerStatePick(Transform objectTransform)
+    {
+        PlayerState = EPlayerState.PLAYER_STATE_PICK;
+
+        m_PickUpObject = objectTransform.gameObject;
+    }
+
+    public void SetPlayerStateThrow()
+    {
+        PlayerState = EPlayerState.PLAYER_STATE_THROW;
+        m_PickUpObject = null;
+    }
+
+    public bool CanPlayerPick()
+    {
+        if (PlayerState != EPlayerState.PLAYER_STATE_READY)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool CanPlayerThrow()
+    {
+        if (PlayerState != EPlayerState.PLAYER_STATE_PICK)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /*
@@ -188,38 +228,20 @@ public class Player : MonoBehaviour
     /*
      * PHYSICS
      */
-    //?? 규태 : 함수 일관성 변경
     public bool ShotRayCastToForward(out Transform objectTransform)
     {
         if (Physics.Raycast(m_PlayerRayVector, PlayerObject.transform.forward, out m_RaycastHit, m_MaxRaycastDistance))
         {
-            Transform hitTransform = m_RaycastHit.transform;
-
-            // 1. EObjectType이 MOVABLE인지 확인한다.
-            if (hitTransform.GetComponent<CGThrowableObject>().IsMovable == false)
-            {
-                objectTransform = null;
-                return false;
-            }
-
-            // 2. EObjectState가 OBJECT_STATE_GROUND인지 확인한다.
-            if (hitTransform.GetComponent<CGThrowableObject>().IsPickable() == false)
-            {
-                objectTransform = null;
-                return false;
-            }
-
-            objectTransform = hitTransform;
+            objectTransform = m_RaycastHit.transform;            
             return true;
         }
-
         objectTransform = null;
         return false;
     }
 
     public bool PickUpObject(Transform objectTransform)
     {
-        if (m_PlayerState != EPlayerState.PLAYER_STATE_READY)
+        if (CanPlayerPick() == false)
         {
             return false;
         }
@@ -227,11 +249,15 @@ public class Player : MonoBehaviour
         // 3. 물체를 집는다.
         objectTransform.GetComponent<CGThrowableObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_PICKED;
 
-        // 4. 물체를 플레이어 우측 팔 부근으로 이동시킨다. + 자식 오브젝트로 붙인다. (흔들거리는 효과)
+        // 4. 물체를 플레이어 우측 팔 부근으로 이동시킨다. + 자식 오브젝트로 붙인다.
         objectTransform.parent = PlayerObject.transform;
 
-        m_PlayerState = EPlayerState.PLAYER_STATE_PICK;
-        m_PickUpObject = objectTransform.gameObject;
+        Vector3 pickUpObjectPosition = objectTransform.position;
+        pickUpObjectPosition.y += PlayerObject.transform.position.y * 0.1f;
+        objectTransform.position = pickUpObjectPosition;
+
+        // 플레이어의 상태를 집은 상태로 변경한다.
+        SetPlayerStatePick(objectTransform);
 
         return true;
     }
@@ -240,19 +266,23 @@ public class Player : MonoBehaviour
     {
         Vector3 playerThrowVector;
 
+        //?? 규태 : 방향은 유저가 바라보고 있는 방향으로 변경 요망
         playerThrowVector = (PlayerObject.transform.up + PlayerObject.transform.forward).normalized;
 
+        // PickUpObject가 날아갈 수 있게 상태를 만든다.
         m_PickUpObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         m_PickUpObject.transform.parent = null;
+
+        // 오브젝트를 던진다.
         PWManager.LaunchCGObject(m_PickUpObject.GetComponent<CGThrowableObject>(), playerThrowVector, throwStrength);
 
-        m_PlayerState = EPlayerState.PLAYER_STATE_THROW;
+        // 플레이어와 게임의 상태를 던지고 있는 상태로 변경한다.
+        SetPlayerStateThrow();
+
+        //?? 규태 : 다른 곳에 콜백 만들고 지우기
+        SetPlayerStateIdle();
 
         _GameManager.SetGameStateThrowing();
-
-        //?? 규태 : 테스트
-        m_PlayerState = EPlayerState.PLAYER_STATE_READY;        
-        //FinishThrowObject();
     }
 
     public void FinishThrowObject()

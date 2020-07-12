@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
         GAME_STATE_PAUSE,
         GAME_STATE_OVER,
     }
-    
+
+    public PhysicsWorldManager _PhysicsWorldManager;
     public WorldSetter.CubeAreaEnum PlayerCubeAreaEnum;
 
     public EGameState GameState;
@@ -46,6 +47,17 @@ public class GameManager : MonoBehaviour
     //?? 규태 : 우선 고정
     private void InitializeGameManager()
     {
+        _PhysicsWorldManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
+
+        Players = new Player[2];
+        PlayerController = new GameObject[2];
+        for (int i = 0; i < 2; i++)
+        {
+            Players[i] = GameObject.Find("Player_" + i).GetComponent<Player>();
+            PlayerController[i] = GameObject.Find("PlayerController_" + i);
+        }
+
+        // 게임 정보
         GameState = EGameState.GAME_STATE_PAUSE;
 
         GamePlayerCount = 2;
@@ -78,7 +90,8 @@ public class GameManager : MonoBehaviour
 
     private void CheckTurnOver()
     {
-        if (GameTurnTime >= GameTurnLimitTime)
+        if (GameTurnTime >= GameTurnLimitTime || 
+            (GameState == EGameState.GAME_STATE_THROWING && _PhysicsWorldManager.GetObservedObjectCount() == 0))
         {
             SetGameTurnOver();
         }
@@ -87,28 +100,46 @@ public class GameManager : MonoBehaviour
     /*
      * 
      */
+    public void SetGameStatePlaying()
+    {
+        GameState = EGameState.GAME_STATE_PLAYING;
+    }
+
     public void SetGameStateThrowing()
     {
         GameState = EGameState.GAME_STATE_THROWING;
     }
 
+    public void SetGameStatePause()
+    {
+        GameState = EGameState.GAME_STATE_PAUSE;
+    }
+
+    public void SetGameStateOver()
+    {
+        GameState = EGameState.GAME_STATE_OVER;
+    }
+
     public void SetGameTurnOver()
     {
-        Players[GameTurnNumber].SetPlayerIdle();
-
+        // 턴을 가지고 있던 유저를 disable
+        Players[GameTurnNumber].SetPlayerStateIdle();
         PlayerController[GameTurnNumber].SetActive(false);
 
+        // 턴을 다음 유저에게 넘긴다.
         GameTurnNumber++;
         if (GameTurnNumber >= GamePlayerCount)
         {
             GameTurnNumber = 0;
         }
 
-        GameTurnTime = 0.0f;
-
-        Players[GameTurnNumber].PlayerState = Player.EPlayerState.PLAYER_STATE_READY;
+        Players[GameTurnNumber].SetPlayerStateReady();
         PlayerController[GameTurnNumber].SetActive(true);
 
-        GameState = EGameState.GAME_STATE_PLAYING;
+
+        // 턴을 초기화 시키고 게임을 다시 진행한다.
+        GameTurnTime = 0.0f;
+
+        SetGameStatePlaying();
     }
 }
