@@ -128,15 +128,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1893034712651935107, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    - target: {fileID: 1694030298335141397, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
-      propertyPath: m_Lightmapping
-      value: 2
+      propertyPath: playerMoveSpeed
+      value: 1800
       objectReference: {fileID: 0}
-    - target: {fileID: 1893034712651935107, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    - target: {fileID: 1893034713037297008, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
-      propertyPath: m_Shadows.m_Type
-      value: 1
+      propertyPath: playerMoveSpeed
+      value: 1800
       objectReference: {fileID: 0}
     - target: {fileID: 2256564529122962787, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
