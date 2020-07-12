@@ -48,12 +48,17 @@ public class PhysicsWorldManager : MonoBehaviour
         m_objects.Add(a);
     }
 
+    public int GetObservedObjectCount()
+    {
+        return m_objects.Count;
+    }
+
     bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     const float kForceSpacePower = 150f;
     Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
 
-    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target )
+    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target)
     {
         m_canAreaChange[(uint)from, (uint)to] = true;
         m_forceSpace[(uint)from, (uint)to] = force;
@@ -128,7 +133,7 @@ public class PhysicsWorldManager : MonoBehaviour
                         // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
                         if (m_objects[objectIndex].isAreaChanged == true)
                         {
-                            if(m_objects[objectIndex].targetArea == ae)
+                            if (m_objects[objectIndex].targetArea == ae)
                             {
                                 m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
                                 m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
@@ -144,7 +149,7 @@ public class PhysicsWorldManager : MonoBehaviour
                             m_objects[objectIndex].currentArea = ae;
                             m_objects[objectIndex].targetArea = m_targetArea[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea];
 
-                            if(m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
+                            if (m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
                             {
                                 m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
                             }
@@ -166,18 +171,18 @@ public class PhysicsWorldManager : MonoBehaviour
     {
         for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
         {
-            CGPhysicsObject po = m_objects[objectIndex];
-
-            switch (po.state)
+            switch (m_objects[objectIndex].state)
             {
                 case CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA:
-                {
-                    // 해당 area에 맞는 gravity 설정
-
-                    // 업데이트 할 PhysicsObject Array에서 제거
-                    m_objects.RemoveAt(objectIndex);
-                    break;
-                }
+                    {
+                        // 해당 area에 맞는 gravity 설정
+                        if (m_objects[objectIndex].obj.GetComponent<CGThrowableObject>().CheckAndChangeObjectState() == true)
+                        {
+                            // 업데이트 할 PhysicsObject Array에서 제거
+                            m_objects.RemoveAt(objectIndex);
+                        }
+                        break;
+                    }
             }
         }
     }
