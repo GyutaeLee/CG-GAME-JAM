@@ -17,8 +17,7 @@ public class CGThrowableObject : CGObject
         // 굴러가는 도중에 힘이 다 되어서 멈추었을 때 상태를 변경해준다.
         if (ObjectState == EObjectState.OBJECT_STATE_ROLLING && m_Rigidbody.IsSleeping() == true)
         {
-            ObjectState = EObjectState.OBJECT_STATE_GROUND;
-            m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            SetObjectStateGround();
 
             bResult = true;
         }
@@ -31,7 +30,7 @@ public class CGThrowableObject : CGObject
         // 던져진 도중에 무언가에 부딪히면 굴러가는 상태로 변경한다.
         if (ObjectState == EObjectState.OBJECT_STATE_THROWN)
         {
-            ObjectState = EObjectState.OBJECT_STATE_ROLLING;
+            SetObjectStateRolling();
         }
     }
 
@@ -54,12 +53,7 @@ public class CGThrowableObject : CGObject
         transform.localRotation = m_OriginLocalRotation;
         transform.localScale = m_OriginLocalScale;
 
-        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-
-        ObjectState = EObjectState.OBJECT_STATE_GROUND;
-
-        m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        SetObjectStateGround();
     }
 
     public void SetLayerAsThrown()
@@ -72,5 +66,33 @@ public class CGThrowableObject : CGObject
     {
         int layerIndex = LayerMask.NameToLayer("CGObjectInArea");
         gameObject.layer = layerIndex;
+    }
+
+    public void SetObjectStateGround()
+    {
+        ObjectState = EObjectState.OBJECT_STATE_GROUND;
+
+        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+
+        m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+    public void SetObjectStatePicked()
+    {
+        ObjectState = EObjectState.OBJECT_STATE_PICKED;
+    }
+
+    public void SetObjectStateThrown()
+    {
+        ObjectState = EObjectState.OBJECT_STATE_THROWN;
+
+        m_Rigidbody.constraints = RigidbodyConstraints.None;
+        transform.parent = null;
+    }
+
+    public void SetObjectStateRolling()
+    {
+        ObjectState = EObjectState.OBJECT_STATE_ROLLING;
     }
 }

@@ -247,7 +247,7 @@ public class Player : MonoBehaviour
         }
 
         // 3. 물체를 집는다.
-        objectTransform.GetComponent<CGThrowableObject>().ObjectState = CGObject.EObjectState.OBJECT_STATE_PICKED;
+        objectTransform.GetComponent<CGThrowableObject>().SetObjectStatePicked();
 
         // 4. 물체를 플레이어 우측 팔 부근으로 이동시킨다. + 자식 오브젝트로 붙인다.
         objectTransform.parent = PlayerObject.transform;
@@ -270,8 +270,7 @@ public class Player : MonoBehaviour
         playerThrowVector = (PlayerObject.transform.up + PlayerObject.transform.forward).normalized;
 
         // PickUpObject가 날아갈 수 있게 상태를 만든다.
-        m_PickUpObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
-        m_PickUpObject.transform.parent = null;
+        m_PickUpObject.GetComponent<CGThrowableObject>().SetObjectStateThrown();
 
         // 오브젝트를 던진다.
         PWManager.LaunchCGObject(m_PickUpObject.GetComponent<CGThrowableObject>(), playerThrowVector, throwStrength);
@@ -283,16 +282,6 @@ public class Player : MonoBehaviour
         SetPlayerStateIdle();
 
         _GameManager.SetGameStateThrowing();
-    }
-
-    public void FinishThrowObject()
-    {
-        m_PlayerState = EPlayerState.PLAYER_STATE_READY;
-
-        m_PickUpObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-
-        m_PickUpObject = null;
-        _GameManager.SetGameTurnOver();
     }
 }
 
