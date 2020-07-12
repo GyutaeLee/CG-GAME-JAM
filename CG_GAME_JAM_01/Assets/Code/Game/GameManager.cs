@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -30,18 +31,26 @@ public class GameManager : MonoBehaviour
     public float GameTurnLimitTime;
     public float GameTurnTime;
 
+    //??
+    public Text FrameText;
+    private float FrameDeltaTime;
+
     private void Start()
     {
         InitializeGameManager();
 
         //?? 규태 : 임시
+        Application.targetFrameRate = 60;
         StartGame();
     }
+    
 
     private void Update()
     {
         UpdateGameManager();
         CheckTurnOver();
+
+        UpdateDebugUI();
     }
 
     //?? 규태 : 우선 고정
@@ -147,5 +156,12 @@ public class GameManager : MonoBehaviour
     public void SceneMove(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+    }
+
+    private void UpdateDebugUI()
+    {
+        FrameDeltaTime += (Time.deltaTime - FrameDeltaTime) * 0.1f;
+        float fps = 1.0f / FrameDeltaTime;
+        FrameText.text = fps.ToString();
     }
 }
