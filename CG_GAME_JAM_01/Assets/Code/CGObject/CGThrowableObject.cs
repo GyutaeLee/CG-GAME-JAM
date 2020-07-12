@@ -9,6 +9,12 @@ public class CGThrowableObject : CGObject
     private Vector3 m_OriginLocalScale;
 
     private Rigidbody m_Rigidbody;
+    private Vector3 m_CubeAreaGravity;
+
+    private void FixedUpdate()
+    {
+        m_Rigidbody.AddForce(m_CubeAreaGravity);
+    }
 
     public bool CheckAndChangeObjectState()
     {
@@ -45,6 +51,8 @@ public class CGThrowableObject : CGObject
         m_OriginLocalScale = transform.localScale;
 
         m_Rigidbody = transform.GetComponent<Rigidbody>();
+        m_Rigidbody.useGravity = false;
+        m_CubeAreaGravity = Vector3.zero;
     }
 
     public void ResetObject()
@@ -76,6 +84,8 @@ public class CGThrowableObject : CGObject
         transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+
+        m_CubeAreaGravity = Vector3.zero;
     }
 
     public void SetObjectStatePicked()
@@ -94,5 +104,10 @@ public class CGThrowableObject : CGObject
     public void SetObjectStateRolling()
     {
         ObjectState = EObjectState.OBJECT_STATE_ROLLING;
+    }
+
+    public void SetCubeAreaGravity(Vector3 v)
+    {
+        m_CubeAreaGravity = v;
     }
 }
