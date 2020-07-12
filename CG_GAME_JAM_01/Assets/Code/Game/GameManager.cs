@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -54,7 +55,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 2; i++)
         {
             Players[i] = GameObject.Find("Player_" + i).GetComponent<Player>();
-            PlayerController[i] = GameObject.Find("PlayerController_" + i);
+            PlayerController[i] = GameObject.Find("Players").transform.Find("PlayerController_" + i).gameObject;
         }
 
         // 게임 정보
@@ -141,5 +142,11 @@ public class GameManager : MonoBehaviour
         GameTurnTime = 0.0f;
 
         SetGameStatePlaying();
+    }
+
+    //?? 규태 : 옮기기
+    public void SceneMove(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 }
