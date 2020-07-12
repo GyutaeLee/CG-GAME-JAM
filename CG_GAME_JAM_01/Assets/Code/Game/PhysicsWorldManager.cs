@@ -61,7 +61,6 @@ public class PhysicsWorldManager : MonoBehaviour
     }
 
     bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
-    const float kForceSpacePower = 150f;
     Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
     WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
 
@@ -178,11 +177,7 @@ public class PhysicsWorldManager : MonoBehaviour
 
                                 if (m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
                                 {
-                                    // 다른 지역으로 넘어갔으므로, target area로 가는 force를 주고,
-                                    m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
-
-                                    // gravity를 zero로 바꿔준다.
-                                    m_objects[objectIndex].obj.SetCubeAreaGravity(Vector3.zero);
+                                    // 다른 지역으로 넘어갔다.
                                 }
                                 else
                                 {
