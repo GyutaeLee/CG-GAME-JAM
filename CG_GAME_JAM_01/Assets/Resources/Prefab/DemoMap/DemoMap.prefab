@@ -4890,8 +4890,9 @@ GameObject:
   - component: {fileID: 4038761651919732628}
   - component: {fileID: 4996628260233807266}
   - component: {fileID: 1615419554431891803}
-  - component: {fileID: 5019419597975594922}
   - component: {fileID: 1033516234394815876}
+  - component: {fileID: 1446394904719607598}
+  - component: {fileID: 1446394904719607599}
   m_Layer: 0
   m_Name: ForestTreeSpruce_03 (3)
   m_TagString: Untagged
@@ -4960,20 +4961,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &5019419597975594922
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033516234394815879}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4061616697597794533, guid: d710544d7060cb749898c84789d8d780, type: 3}
 --- !u!114 &1033516234394815876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4988,6 +4975,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1446394904719607598
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516234394815879}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1446394904719607599
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516234394815879}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33333334, y: 0.78223526, z: 0.3333333}
+  m_Center: {x: 0.000000028222615, y: 0.3911175, z: 0.000000014901172}
 --- !u!1 &1033516234639204867
 GameObject:
   m_ObjectHideFlags: 0
@@ -5124,8 +5140,9 @@ GameObject:
   - component: {fileID: 4038761651072432049}
   - component: {fileID: 4996628259973844359}
   - component: {fileID: 1615419554188538238}
-  - component: {fileID: 5019419598722264975}
   - component: {fileID: 1033516234705110435}
+  - component: {fileID: 1446394904493035273}
+  - component: {fileID: 1446394904493035274}
   m_Layer: 0
   m_Name: ForestTreeSpruce_03 (2)
   m_TagString: Untagged
@@ -5194,20 +5211,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &5019419598722264975
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033516234705110434}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4061616697597794533, guid: d710544d7060cb749898c84789d8d780, type: 3}
 --- !u!114 &1033516234705110435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5222,6 +5225,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1446394904493035273
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516234705110434}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1446394904493035274
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516234705110434}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.78223526, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.39111763, z: 0.00000001490116}
 --- !u!1 &1033516234919049554
 GameObject:
   m_ObjectHideFlags: 0
@@ -5483,8 +5515,9 @@ GameObject:
   - component: {fileID: 4038761650493356152}
   - component: {fileID: 4996628259210740302}
   - component: {fileID: 1615419555958800055}
-  - component: {fileID: 5019419597355180102}
   - component: {fileID: 1033516235284187752}
+  - component: {fileID: 1446394906145325250}
+  - component: {fileID: 1446394906145325251}
   m_Layer: 0
   m_Name: ForestTreeSpruce_03 (5)
   m_TagString: Untagged
@@ -5553,20 +5586,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &5019419597355180102
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033516235284187755}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4061616697597794533, guid: d710544d7060cb749898c84789d8d780, type: 3}
 --- !u!114 &1033516235284187752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5581,6 +5600,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1446394906145325250
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516235284187755}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1446394906145325251
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033516235284187755}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.78223526, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.39111763, z: 0.00000001490116}
 --- !u!1 &1033516235322858495
 GameObject:
   m_ObjectHideFlags: 0
@@ -6092,8 +6140,9 @@ GameObject:
   - component: {fileID: 4163479780192239450}
   - component: {fileID: 4944002902855124332}
   - component: {fileID: 1702405847938103701}
-  - component: {fileID: 3488862340836954383}
   - component: {fileID: 1125054476361125198}
+  - component: {fileID: 1574454605981108196}
+  - component: {fileID: 1574454605981108197}
   m_Layer: 0
   m_Name: ForestTree_01 (1)
   m_TagString: Untagged
@@ -6162,20 +6211,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &3488862340836954383
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1125054476361125193}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 8844255077189841721, guid: 1f3bb44e097c59246a6e41b239e67f11, type: 3}
 --- !u!114 &1125054476361125198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6190,6 +6225,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1574454605981108196
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125054476361125193}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1574454605981108197
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125054476361125193}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.34717318, y: 0.62862855, z: 0.29341358}
+  m_Center: {x: 0.002746597, y: 0.31431428, z: -0.01640664}
 --- !u!1 &1534771378929333515
 GameObject:
   m_ObjectHideFlags: 0
@@ -6451,8 +6515,9 @@ GameObject:
   - component: {fileID: 2528704845993825555}
   - component: {fileID: 6795022644422536997}
   - component: {fileID: 968358018519503836}
-  - component: {fileID: 8931683809391522759}
   - component: {fileID: 1534771379001599745}
+  - component: {fileID: 1083664893772508587}
+  - component: {fileID: 1083664893772508588}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (3)
   m_TagString: Untagged
@@ -6521,20 +6586,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683809391522759
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771379001599744}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771379001599745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6549,6 +6600,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664893772508587
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379001599744}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664893772508588
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379001599744}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771379047036438
 GameObject:
   m_ObjectHideFlags: 0
@@ -6560,8 +6640,9 @@ GameObject:
   - component: {fileID: 2528704845940917253}
   - component: {fileID: 6795022644443954739}
   - component: {fileID: 968358018533737162}
-  - component: {fileID: 8931683809439048401}
   - component: {fileID: 1534771379047036439}
+  - component: {fileID: 1083664893816896701}
+  - component: {fileID: 1083664893816896702}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (5)
   m_TagString: Untagged
@@ -6630,20 +6711,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683809439048401
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771379047036438}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771379047036439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6658,6 +6725,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664893816896701
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379047036438}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664893816896702
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379047036438}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33333334, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000003288395, y: 0.4223796, z: -0.00000010430811}
 --- !u!1 &1534771379065592460
 GameObject:
   m_ObjectHideFlags: 0
@@ -6794,8 +6890,9 @@ GameObject:
   - component: {fileID: 2528704846378703023}
   - component: {fileID: 6795022644278796953}
   - component: {fileID: 968358018099109472}
-  - component: {fileID: 8931683809805532795}
   - component: {fileID: 1534771379149269693}
+  - component: {fileID: 1083664893383303191}
+  - component: {fileID: 1083664893383303192}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (4)
   m_TagString: Untagged
@@ -6864,20 +6961,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683809805532795
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771379149269692}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771379149269693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6892,6 +6975,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664893383303191
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379149269692}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664893383303192
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379149269692}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771379261993521
 GameObject:
   m_ObjectHideFlags: 0
@@ -7028,8 +7140,9 @@ GameObject:
   - component: {fileID: 2528704846211168579}
   - component: {fileID: 6795022644177961845}
   - component: {fileID: 968358018267578252}
-  - component: {fileID: 8931683809705811863}
   - component: {fileID: 1534771379317984081}
+  - component: {fileID: 1083664893550510587}
+  - component: {fileID: 1083664893550510588}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (8)
   m_TagString: Untagged
@@ -7098,20 +7211,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683809705811863
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771379317984080}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771379317984081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7126,6 +7225,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664893550510587
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379317984080}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664893550510588
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379317984080}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771379320643211
 GameObject:
   m_ObjectHideFlags: 0
@@ -7637,8 +7765,9 @@ GameObject:
   - component: {fileID: 2528704845023437008}
   - component: {fileID: 6795022643518069478}
   - component: {fileID: 968358019495274015}
-  - component: {fileID: 8931683808483771908}
   - component: {fileID: 1534771379977097920}
+  - component: {fileID: 1083664894746957930}
+  - component: {fileID: 1083664894746957931}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (10)
   m_TagString: Untagged
@@ -7707,20 +7836,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683808483771908
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771379977097923}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771379977097920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7735,6 +7850,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664894746957930
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379977097923}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664894746957931
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771379977097923}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771380109270266
 GameObject:
   m_ObjectHideFlags: 0
@@ -7746,8 +7890,9 @@ GameObject:
   - component: {fileID: 2528704844887207657}
   - component: {fileID: 6795022643381703903}
   - component: {fileID: 968358019627444262}
-  - component: {fileID: 8931683808351701053}
   - component: {fileID: 1534771380109270267}
+  - component: {fileID: 1083664894879192657}
+  - component: {fileID: 1083664894879192658}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (7)
   m_TagString: Untagged
@@ -7816,20 +7961,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683808351701053
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771380109270266}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771380109270267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7844,6 +7975,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664894879192657
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771380109270266}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664894879192658
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771380109270266}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771380498747513
 GameObject:
   m_ObjectHideFlags: 0
@@ -7855,8 +8015,9 @@ GameObject:
   - component: {fileID: 2528704844488155754}
   - component: {fileID: 6795022642975447132}
   - component: {fileID: 968358018959959205}
-  - component: {fileID: 8931683809009616062}
   - component: {fileID: 1534771380498747518}
+  - component: {fileID: 1083664894195981012}
+  - component: {fileID: 1083664894195981013}
   m_Layer: 0
   m_Name: ForestTreeSpruce_01 (2)
   m_TagString: Untagged
@@ -7925,20 +8086,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &8931683809009616062
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1534771380498747513}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 7675254398638025943, guid: 3c67e2bd7e46e1e4eadf53ae5046754f, type: 3}
 --- !u!114 &1534771380498747518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7953,6 +8100,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &1083664894195981012
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771380498747513}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &1083664894195981013
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534771380498747513}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3333333, y: 0.844759, z: 0.3333333}
+  m_Center: {x: 0.00000001490116, y: 0.4223795, z: 0.00000001490116}
 --- !u!1 &1534771380919322120
 GameObject:
   m_ObjectHideFlags: 0
@@ -22296,8 +22472,9 @@ GameObject:
   - component: {fileID: 5161913760870663500}
   - component: {fileID: 4249651510443163514}
   - component: {fileID: 7621571488056951683}
-  - component: {fileID: 4859218051206825072}
   - component: {fileID: 8212759151893509980}
+  - component: {fileID: 7763359018516479478}
+  - component: {fileID: 7763359018516479479}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (2)
   m_TagString: Untagged
@@ -22366,20 +22543,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218051206825072
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759151893509983}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759151893509980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22394,6 +22557,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359018516479478
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759151893509983}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359018516479479
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759151893509983}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126223, y: 0.7300906, z: 0.33126223}
+  m_Center: {x: 0.00000001490116, y: 0.3650453, z: -0.0000002235174}
 --- !u!1 &8212759152105204784
 GameObject:
   m_ObjectHideFlags: 0
@@ -22530,8 +22722,9 @@ GameObject:
   - component: {fileID: 5161913761167234850}
   - component: {fileID: 4249651510144527636}
   - component: {fileID: 7621571487750033901}
-  - component: {fileID: 4859218051505985054}
   - component: {fileID: 8212759152121095478}
+  - component: {fileID: 7763359018206670748}
+  - component: {fileID: 7763359018206670749}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (5)
   m_TagString: Untagged
@@ -22600,20 +22793,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218051505985054
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759152121095473}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759152121095478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22628,6 +22807,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359018206670748
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152121095473}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359018206670749
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152121095473}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126226, y: 0.7300906, z: 0.33126223}
+  m_Center: {x: 0.00000003044296, y: 0.3650453, z: -0.00000022351739}
 --- !u!1 &8212759152855607470
 GameObject:
   m_ObjectHideFlags: 0
@@ -22639,8 +22847,9 @@ GameObject:
   - component: {fileID: 5161913760442292925}
   - component: {fileID: 4249651509493637259}
   - component: {fileID: 7621571487360212082}
-  - component: {fileID: 4859218052172077953}
   - component: {fileID: 8212759152855607471}
+  - component: {fileID: 7763359017866846725}
+  - component: {fileID: 7763359017866846726}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (4)
   m_TagString: Untagged
@@ -22709,20 +22918,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218052172077953
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759152855607470}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759152855607471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22737,6 +22932,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359017866846725
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152855607470}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359017866846726
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152855607470}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126223, y: 0.7300906, z: 0.33126223}
+  m_Center: {x: 0.00000001490116, y: 0.3650453, z: -0.0000002235174}
 --- !u!1 &8212759152938984429
 GameObject:
   m_ObjectHideFlags: 0
@@ -22748,8 +22972,9 @@ GameObject:
   - component: {fileID: 5161913759820861950}
   - component: {fileID: 4249651509343415240}
   - component: {fileID: 7621571489088018225}
-  - component: {fileID: 4859218052323872962}
   - component: {fileID: 8212759152938984418}
+  - component: {fileID: 7763359019561429320}
+  - component: {fileID: 7763359019561429321}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (7)
   m_TagString: Untagged
@@ -22818,20 +23043,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218052323872962
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759152938984429}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759152938984418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22846,6 +23057,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359019561429320
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152938984429}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359019561429321
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759152938984429}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126223, y: 0.7300906, z: 0.33126223}
+  m_Center: {x: 0.00000001490116, y: 0.3650453, z: -0.0000002235174}
 --- !u!1 &8212759153004766087
 GameObject:
   m_ObjectHideFlags: 0
@@ -22857,8 +23097,9 @@ GameObject:
   - component: {fileID: 5161913759752065428}
   - component: {fileID: 4249651509416307618}
   - component: {fileID: 7621571489019320155}
-  - component: {fileID: 4859218052249931944}
   - component: {fileID: 8212759153004766084}
+  - component: {fileID: 7763359019626096942}
+  - component: {fileID: 7763359019626096943}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (3)
   m_TagString: Untagged
@@ -22927,20 +23168,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218052249931944
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759153004766087}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759153004766084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22955,6 +23182,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359019626096942
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759153004766087}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359019626096943
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759153004766087}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126223, y: 0.7300906, z: 0.33126223}
+  m_Center: {x: 0.00000001490116, y: 0.3650453, z: -0.0000002235174}
 --- !u!1 &8212759153162557014
 GameObject:
   m_ObjectHideFlags: 0
@@ -22966,8 +23222,9 @@ GameObject:
   - component: {fileID: 5161913759589033029}
   - component: {fileID: 4249651509304647283}
   - component: {fileID: 7621571489191797386}
-  - component: {fileID: 4859218052345865593}
   - component: {fileID: 8212759153162557015}
+  - component: {fileID: 7763359019784936701}
+  - component: {fileID: 7763359019784936702}
   m_Layer: 0
   m_Name: ForestTreeSpruce_02 (8)
   m_TagString: Untagged
@@ -23036,20 +23293,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4859218052345865593
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8212759153162557014}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7620298467710358605, guid: 5e7d094e646de6847846fd7b0f5a4d6f, type: 3}
 --- !u!114 &8212759153162557015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23064,6 +23307,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsMovable: 0
   ObjectState: 1
+--- !u!54 &7763359019784936701
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759153162557014}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &7763359019784936702
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212759153162557014}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.33126223, y: 0.73009056, z: 0.33126223}
+  m_Center: {x: 0.00000001490116, y: 0.36504528, z: -0.0000002235174}
 --- !u!1 &8212759153273792827
 GameObject:
   m_ObjectHideFlags: 0
