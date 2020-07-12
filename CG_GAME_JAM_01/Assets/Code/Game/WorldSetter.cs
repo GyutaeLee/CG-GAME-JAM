@@ -22,45 +22,56 @@ public class WorldSetter : MonoBehaviour
 
     public enum CubeAreaEnum : uint
     {
-        XP = 0,     // (1, 0, 0)
-        XM,         // (-1, 0, 0)
-        YP,         // (0, 1, 0)
-        YM,
-        ZP,
-        ZM,
+        XP, XM,    
+        YP, YM,
+        ZP, ZM,
 
-        XP_YP,
-        XP_YM,
+        XP_YP, XP_YM,
+        XM_YP, XM_YM,
 
-        XM_YP,
-        XM_YM,
+        XP_ZP, XP_ZM,
+        XM_ZP, XM_ZM,
 
-        XP_ZP,
-        XP_ZM,
+        YP_ZP, YP_ZM,
+        YM_ZP, YM_ZM,
 
-        XM_ZP,
-        XM_ZM,
+        XP_YP_ZP, XP_YP_ZM,
 
-        YP_ZP,
-        YP_ZM,
+        XP_YM_ZP, XP_YM_ZM,
 
-        YM_ZP,
-        YM_ZM,
+        XM_YP_ZP, XM_YP_ZM,
 
-        XP_YP_ZP,
-        XP_YP_ZM,
-
-        XP_YM_ZP,
-        XP_YM_ZM,
-
-        XM_YP_ZP,
-        XM_YP_ZM,
-
-        XM_YM_ZP,
-        XM_YM_ZM,
+        XM_YM_ZP, XM_YM_ZM,
 
         NONE
     }
+
+    private int[,] m_areaEnumToCoordinate = new int[27, 3]
+    {
+        { 1, 0, 0 }, {-1, 0, 0 }, 
+        { 0, 1, 0 }, {0, -1, 0 }, 
+        { 0, 0, 1 }, {0, 0, -1 },
+
+        { 1, 1, 0 }, { 1, -1, 0 }, 
+        { -1, 1, 0 }, { -1, -1, 0 },
+
+        { 1, 0, 1 }, { 1, 0, -1 },
+        { -1, 0, 1 }, { -1, 0, -1 },
+
+        { 0, 1, 1 }, { 0, 1, -1},
+        { 0, -1, 1 }, {0, -1, -1},
+
+        { 1, 1, 1 }, {1, 1, -1},
+        
+        { 1, -1, 1 }, { 1, -1, -1 },
+
+        {-1, 1, 1 }, { -1, 1, -1},
+        
+        { -1, -1, 1 }, {-1, -1, -1},
+
+        { 0, 0, 0 }
+    };
+
 
     private CubeAreaEnum[,,] m_areaEnumLUT = new CubeAreaEnum[3, 3, 3];
 
@@ -100,6 +111,35 @@ public class WorldSetter : MonoBehaviour
             bz = -1;
 
         return GetCubeAreaEnum(bx, by, bz);
+    }
+
+    private Bounds[,,] m_areaBound = new Bounds[3, 3, 3];
+
+    public Bounds GetCubeAreaBound(CubeAreaEnum area)
+    {
+        int x = m_areaEnumToCoordinate[(uint)area, 0];
+        int y = m_areaEnumToCoordinate[(uint)area, 1];
+        int z = m_areaEnumToCoordinate[(uint)area, 2];
+        return m_areaBound[x + 1, y + 1, z + 1];
+    }
+    
+    /*
+     *  @brief : AABB A가 AABB B안에 있는가? 
+     */
+    public static bool IsAInsideB(Vector3 minA, Vector3 maxA, Vector3 minB, Vector3 maxB)
+    {
+        if(minB.x <= minA.x &&
+            minB.y <= minA.y &&
+            minB.z <= minA.z &&
+            maxA.x <= maxB.x &&
+            maxA.y <= maxB.y &&
+            maxA.z <= maxB.z
+            )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     enum PlaneDirectionEnum : uint
@@ -472,6 +512,18 @@ public class WorldSetter : MonoBehaviour
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
+
+        for (int i = 0; i < m_cubeAreaObject.Length; ++i)
+        {
+            CubeAreaEnum ae = (CubeAreaEnum)i;
+
+            int x = m_areaEnumToCoordinate[i, 0] + 1;
+            int y = m_areaEnumToCoordinate[i, 1] + 1;
+            int z = m_areaEnumToCoordinate[i, 2] + 1;
+
+            // Get World Bound from Renderer
+            m_areaBound[x, y, z] = m_cubeAreaObject[i].GetComponent<Renderer>().bounds;
+        }
     }
 
     void Start()
@@ -486,11 +538,5 @@ public class WorldSetter : MonoBehaviour
         initDebuggingPlanes();
         initLightSetting();
         initCubeAreaSetting();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

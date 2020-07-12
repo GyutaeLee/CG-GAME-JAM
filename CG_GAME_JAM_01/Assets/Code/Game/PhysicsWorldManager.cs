@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PhysicsWorldManager : MonoBehaviour
 {
-    const float kLaunchPower = 100f;
+    const float kLaunchPower = 30f;
     private WorldSetter m_worldSetter;
     private class CGPhysicsObject
     {
@@ -123,12 +123,18 @@ public class PhysicsWorldManager : MonoBehaviour
                 case CGPhysicsObject.EObjectState.OBJECT_MOVING:
                     {
                         WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(m_objects[objectIndex].obj.transform.position);
+                        Bounds areaWorldBound = m_worldSetter.GetCubeAreaBound(ae);
+                        Bounds objWorldBound = m_objects[objectIndex].obj.GetComponent<Renderer>().bounds;
+                        bool isInside = WorldSetter.IsAInsideB(objWorldBound.min, objWorldBound.max, areaWorldBound.min, areaWorldBound.max);
+
 
                         // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
                         // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
                         if (m_objects[objectIndex].isAreaChanged == true)
                         {
-                            if(m_objects[objectIndex].targetArea == ae)
+                            // 해당 target area에 넘어왔고, bound box가 완전히 들어왔다면
+                            // Layer 설정을 바꾸어서 plane과 충돌처리 되게 한다.
+                            if(m_objects[objectIndex].targetArea == ae && isInside)
                             {
                                 m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
                                 m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
@@ -139,19 +145,24 @@ public class PhysicsWorldManager : MonoBehaviour
 
                         if (m_objects[objectIndex].currentArea != ae)
                         {
-                            m_objects[objectIndex].isAreaChanged = true;
-                            m_objects[objectIndex].previousArea = m_objects[objectIndex].currentArea;
-                            m_objects[objectIndex].currentArea = ae;
-                            m_objects[objectIndex].targetArea = m_targetArea[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea];
+                            // 해당 넘어가는 지역으로 완전히 들어 갔으면, Area Changed를 true로 해주고,
+                            // 해당 지역의 Force를 넘겨준다.
+                            if(isInside)
+                            {
+                                m_objects[objectIndex].isAreaChanged = true;
+                                m_objects[objectIndex].previousArea = m_objects[objectIndex].currentArea;
+                                m_objects[objectIndex].currentArea = ae;
+                                m_objects[objectIndex].targetArea = m_targetArea[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea];
 
-                            if(m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
-                            {
-                                m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
-                            }
-                            else
-                            {
-                                // PutBack the Throwable Object
-                                m_objects[objectIndex].obj.ResetObject();
+                                if (m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
+                                {
+                                    m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
+                                }
+                                else
+                                {
+                                    // PutBack the Throwable Object
+                                    m_objects[objectIndex].obj.ResetObject();
+                                }
                             }
                         }
 
