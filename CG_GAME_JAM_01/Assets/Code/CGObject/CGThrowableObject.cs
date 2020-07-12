@@ -28,4 +28,16 @@ public class CGThrowableObject : CGObject
         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
+
+    public void SetLayerAsThrown()
+    {
+        int layerIndex = LayerMask.NameToLayer("CGThrown");
+        gameObject.layer = layerIndex;
+    }
+
+    public void SetLayerAsInArea()
+    {
+        int layerIndex = LayerMask.NameToLayer("CGObjectInArea");
+        gameObject.layer = layerIndex;
+    }
 }

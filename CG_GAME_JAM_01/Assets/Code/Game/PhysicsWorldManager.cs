@@ -115,6 +115,7 @@ public class PhysicsWorldManager : MonoBehaviour
                 case CGPhysicsObject.EObjectState.OBJECT_LAUNCH_TRIGGER:
                     {
                         Vector3 launchForce = m_objects[objectIndex].direction * m_objects[objectIndex].power * kLaunchPower;
+                        m_objects[objectIndex].obj.SetLayerAsThrown();  // Preventing CGThrowableObject from colliding with world barrier planes
                         m_objects[objectIndex].rb.AddForce(launchForce);
                         m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_MOVING;
                         break;
@@ -130,6 +131,7 @@ public class PhysicsWorldManager : MonoBehaviour
                             if(m_objects[objectIndex].targetArea == ae)
                             {
                                 m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
+                                m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
                             }
 
                             continue;

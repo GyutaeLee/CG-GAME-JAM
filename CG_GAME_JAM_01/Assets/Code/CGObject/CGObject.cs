@@ -38,7 +38,7 @@ public class CGObject : MonoBehaviour
     public virtual void InitializeCGObject()
     {
         // Set layer
-        int cgObjectLayerIndex = LayerMask.NameToLayer("CGObject");
+        int cgObjectLayerIndex = LayerMask.NameToLayer("CGObjectInArea");
         gameObject.layer = cgObjectLayerIndex;
     }
 }
