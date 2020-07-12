@@ -73,7 +73,7 @@ public class PhysicsWorldManager : MonoBehaviour
 
     void Start()
     {
-        m_worldSetter = GameObject.Find("Cube").GetComponent<WorldSetter>();
+        m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
 
         // 초기화
         for (int i = 0; i < (uint)WorldSetter.CubeAreaEnum.NONE; ++i)
@@ -183,6 +183,7 @@ public class PhysicsWorldManager : MonoBehaviour
                                 {
                                     // PutBack the Throwable Object
                                     m_objects[objectIndex].obj.ResetObject();
+                                    m_objects.RemoveAt(objectIndex);
                                 }
                             }
                         }

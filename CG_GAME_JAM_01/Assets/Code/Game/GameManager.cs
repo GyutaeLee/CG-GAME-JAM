@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
     }
 
     public PhysicsWorldManager _PhysicsWorldManager;
-    public WorldSetter.CubeAreaEnum PlayerCubeAreaEnum;
 
     public EGameState GameState;
 

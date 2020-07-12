@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -26,7 +25,7 @@ public class Player : MonoBehaviour
     public GameManager _GameManager;
 
     private PhysicsWorldManager PWManager;
-
+    private WorldSetter _WorldSetter;
 
     public GameObject PlayerObject;
     public Rigidbody PlayerRigidbody;
@@ -34,11 +33,13 @@ public class Player : MonoBehaviour
     public float playerMoveSpeed = 0.01f;
 
     private const int m_AreaCount = 6;
-    private Vector3[] m_MoveForwardVectors;
-    private Vector3[] m_MoveRightVectors;
+    private Vector3 m_MoveForwardVectors;
+    private Vector3 m_MoveRightVectors;
 
     private Vector3 m_PlayerUpVector;
     private Quaternion m_OriginQuaternion;
+
+    private WorldSetter.CubeAreaEnum m_ECubeArea;
 
     private Vector3 m_PlayerRayVector;
     private RaycastHit m_RaycastHit;
@@ -66,26 +67,35 @@ public class Player : MonoBehaviour
         int cgPlayerLayer = LayerMask.NameToLayer("CGPlayer");
         gameObject.layer = cgPlayerLayer;
 
-        SetDirectionVectors();
-
         PWManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
+        _WorldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
 
         m_PlayerUpVector = PlayerObject.transform.up;
         m_OriginQuaternion = PlayerObject.transform.localRotation;
 
         m_PlayerHeight = PlayerObject.transform.GetComponent<CapsuleCollider>().height;
+
+        SetPlayerDirectionVectors();
     }
 
-    private void SetDirectionVectors()
+    private void SetPlayerDirectionVectors()
     {
-        m_MoveForwardVectors = new Vector3[m_AreaCount];
-        m_MoveRightVectors = new Vector3[m_AreaCount];
+        m_ECubeArea = _WorldSetter.GetCubeAreaEnum(PlayerObject.transform.position);
 
-        m_MoveForwardVectors[(int)WorldSetter.CubeAreaEnum.YP] = Vector3.forward;
-        m_MoveRightVectors[(int)WorldSetter.CubeAreaEnum.YP] = Vector3.right;
+        switch (m_ECubeArea)
+        {
+            case WorldSetter.CubeAreaEnum.YP:
+                m_MoveForwardVectors = Vector3.forward;
+                m_MoveRightVectors = Vector3.right;
+                break;
+            case WorldSetter.CubeAreaEnum.ZM:
 
-        m_MoveForwardVectors[(int)WorldSetter.CubeAreaEnum.ZM] = Vector3.up;
-        m_MoveRightVectors[(int)WorldSetter.CubeAreaEnum.ZM] = Vector3.right;
+                m_MoveForwardVectors = Vector3.up;
+                m_MoveRightVectors = Vector3.right;
+                break;
+            default:
+                break;
+        }
     }
 
     private void UpdatePlayer()
@@ -194,8 +204,8 @@ public class Player : MonoBehaviour
         float verticalSpeed   = verticalValue * playerMoveSpeed * Time.deltaTime;
         Vector3 moveVector = Vector3.zero;
 
-        moveVector += m_MoveRightVectors[(int)_GameManager.PlayerCubeAreaEnum] * horizontalSpeed;
-        moveVector += m_MoveForwardVectors[(int)_GameManager.PlayerCubeAreaEnum] * verticalSpeed;
+        moveVector += m_MoveRightVectors * horizontalSpeed;
+        moveVector += m_MoveForwardVectors * verticalSpeed;
 
         PlayerRigidbody.AddForce(moveVector);
     }

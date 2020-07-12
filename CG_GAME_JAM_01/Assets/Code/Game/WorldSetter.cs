@@ -526,7 +526,9 @@ public class WorldSetter : MonoBehaviour
         }
     }
 
-    void Start()
+    //?? 규태 : 게임매니저에서 순서 관리하기
+    //void Start()
+    void Awake()
     {
         m_emptyGameObjectPrefab = Resources.Load("Prefab/GameObject") as GameObject;
 

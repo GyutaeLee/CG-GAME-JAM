@@ -79,7 +79,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         JoystickVerticalValue   = 0.0f;
     }
 
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         if (IsPointerDown == true)
         { 
