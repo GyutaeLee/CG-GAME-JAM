@@ -41,10 +41,17 @@ public class PhysicsWorldManager : MonoBehaviour
         public float power;
     }
 
+    Vector3[] m_cubeAreaGravity = new Vector3[6];
+
     List<CGPhysicsObject> m_objects = new List<CGPhysicsObject>();
     public void LaunchCGObject(CGThrowableObject obj, Vector3 direction, float power)
     {
         CGPhysicsObject a = new CGPhysicsObject(obj, direction, power, m_worldSetter);
+
+        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(a.obj.transform.position);
+        Vector3 startGravity = m_cubeAreaGravity[(uint)ae];
+
+        a.obj.SetCubeAreaGravity(startGravity);
         m_objects.Add(a);
     }
 
@@ -109,6 +116,13 @@ public class PhysicsWorldManager : MonoBehaviour
         SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.XM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.XM);
         SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YP_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YP);
         SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YM);
+
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.XP] = Vector3.left * Physics.gravity.magnitude;
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.XM] = Vector3.right* Physics.gravity.magnitude;
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.YP] = Vector3.down * Physics.gravity.magnitude;
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.YM] = Vector3.up * Physics.gravity.magnitude;
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.ZP] = Vector3.back * Physics.gravity.magnitude;
+        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.ZM] = Vector3.forward * Physics.gravity.magnitude;
     }
 
     private void FixedUpdate()
@@ -142,6 +156,10 @@ public class PhysicsWorldManager : MonoBehaviour
                             {
                                 m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
                                 m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
+
+                                // 해당 지역의 gravity로 설정해준다.
+                                Vector3 targetGravity = m_cubeAreaGravity[(uint)ae];
+                                m_objects[objectIndex].obj.SetCubeAreaGravity(targetGravity);
                             }
 
                             continue;
@@ -160,7 +178,11 @@ public class PhysicsWorldManager : MonoBehaviour
 
                                 if (m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
                                 {
+                                    // 다른 지역으로 넘어갔으므로, target area로 가는 force를 주고,
                                     m_objects[objectIndex].rb.AddForce(m_forceSpace[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] * kForceSpacePower);
+
+                                    // gravity를 zero로 바꿔준다.
+                                    m_objects[objectIndex].obj.SetCubeAreaGravity(Vector3.zero);
                                 }
                                 else
                                 {
