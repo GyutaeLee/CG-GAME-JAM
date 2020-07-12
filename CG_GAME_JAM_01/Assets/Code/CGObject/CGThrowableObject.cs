@@ -13,7 +13,10 @@ public class CGThrowableObject : CGObject
 
     private void FixedUpdate()
     {
-        m_Rigidbody.AddForce(m_CubeAreaGravity);
+        if(m_CubeAreaGravity != Vector3.zero)
+        {
+            m_Rigidbody.AddForce(m_CubeAreaGravity * m_Rigidbody.mass * m_Rigidbody.mass);
+        }
     }
 
     public bool CheckAndChangeObjectState()
