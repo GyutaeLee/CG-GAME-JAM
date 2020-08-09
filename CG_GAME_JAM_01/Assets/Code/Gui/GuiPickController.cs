@@ -5,24 +5,24 @@ using UnityEngine.EventSystems;
 
 public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    public Player _Player;
+    public Player player;
 
     public bool IsPointerDown
     {
-        get { return isPointerDown; }
-        set { isPointerDown = value; }
+        get { return this.m_isPointerDown; }
+        set { this.m_isPointerDown = value; }
     }
 
-    [SerializeField] private bool isPointerDown;
+    [SerializeField] private bool m_isPointerDown;
 
     private void Start()
     {
-        
+        InitPickController();
     }
 
-    private void InitializePickController()
+    private void InitPickController()
     {
-        
+
     }
 
     /*
@@ -30,7 +30,7 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
      */
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        IsPointerDown = true;
+        this.m_isPointerDown = true;
     }
 
     public virtual void OnPointerUp(PointerEventData eventData)
@@ -38,27 +38,27 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         Transform objectTransform = null;
 
         //?? 규태 : 테스트 코드
-        if (_Player.CanPlayerThrowObject())
+        if (this.player.CanPlayerThrowObject())
         {
-            _Player.ThrowObject(1.0f);
+            this.player.ThrowObject(1.0f);
         }
-        else if (_Player.ShotRayCastToForward(out objectTransform) == true)
+        else if (this.player.ShotRayCastToForward(out objectTransform) == true)
         {
             if (CheckObjectIsPickable(objectTransform) == true)
             {
-                _Player.PickUpObject(objectTransform);
+                this.player.PickUpObject(objectTransform);
             }
         }               
 
-        InitializePointerData();
+        InitPointerData();
     }
 
     /*
      *  INIT
      */
-    private void InitializePointerData()
+    private void InitPointerData()
     {
-        isPointerDown = false;
+        this.m_isPointerDown = false;
     }
 
     /*

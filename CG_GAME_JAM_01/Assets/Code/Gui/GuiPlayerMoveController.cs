@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GuiPlayerMoveController : Joystick
 {
-    public Player _Player;
+    //?? 규태 : 추후에 각 플레이어에 맞게 불러오자
+    public Player player;
         
     public override void KeyboardDownFunction()
     {
@@ -30,8 +32,8 @@ public class GuiPlayerMoveController : Joystick
             horizontalValue = -1.0f;
         }
 
-        _Player.RotatePlayerObject(horizontalValue, verticalValue);
-        _Player.MovePlayerObject(horizontalValue, verticalValue);
+        this.player.RotatePlayerObject(horizontalValue, verticalValue);
+        this.player.MovePlayerObject(horizontalValue, verticalValue);
 #endif
     }
 
@@ -39,7 +41,7 @@ public class GuiPlayerMoveController : Joystick
     {
         base.PointerDownFunction();
 
-        _Player.RotatePlayerObject(JoystickHorizontalValue, JoystickVerticalValue);
-        _Player.MovePlayerObject(JoystickHorizontalValue, JoystickVerticalValue);
+        this.player.RotatePlayerObject(base.JoystickHorizontalValue, base.JoystickVerticalValue);
+        this.player.MovePlayerObject(base.JoystickHorizontalValue, base.JoystickVerticalValue);
     }
 }

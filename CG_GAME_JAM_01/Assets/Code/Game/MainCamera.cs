@@ -2,22 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//?? 규태 : 스크립트 이름 변경하기
 public class MainCamera : MonoBehaviour
 {
-    public GameObject CameraObject;
-    public Camera _Camera;
+    public GameObject cameraObject;
+    private Camera m_camera;
+    private Transform m_cameraOriginTransform;
 
-    public Transform cameraOriginTransform;
-    public float cameraMoveSpeed = 1.0f;
-    public float cameraRotateSpeed = 0.1f;
+    public float cameraMoveSpeed;
+    public float cameraRotateSpeed;
 
     private void Start()
     {
-        InitializeMainCamera();
+        InitMainCamera();
     }
 
-    private void InitializeMainCamera()
+    private void InitMainCamera()
     {
-        cameraOriginTransform = CameraObject.transform;
+        this.cameraObject = GameObject.Find("Main Camera");
+        this.m_camera = this.cameraObject.GetComponent<Camera>();
+        this.m_cameraOriginTransform = this.cameraObject.transform;
+
+        this.m_cameraOriginTransform = this.cameraObject.transform;
+        this.cameraMoveSpeed = 1.0f;
+        this.cameraRotateSpeed = 0.1f;
     }
 }

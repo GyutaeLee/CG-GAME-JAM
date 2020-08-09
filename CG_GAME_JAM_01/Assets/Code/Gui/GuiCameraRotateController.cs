@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GuiCameraRotateController : Joystick
 {
-    public MainCamera _ThirdPersonViewCamera;
-    public GameObject CenterStandardObject;
+    public MainCamera thirdPersonViewCamera;
+    public GameObject centerStandardObject;
 
     public override void PointerDownFunction()
     {
@@ -15,12 +15,12 @@ public class GuiCameraRotateController : Joystick
     }
     public void RotateCameraCenteredOnObject(float horizontalValue, float verticalValue)
     {
-        Transform camTransform = _ThirdPersonViewCamera.CameraObject.transform;
+        Transform camTransform = this.thirdPersonViewCamera.cameraObject.transform;
         Vector3 rotation = Vector3.zero;
 
         rotation.x = verticalValue;
         rotation.y = -horizontalValue;
 
-        camTransform.RotateAround(CenterStandardObject.transform.position, rotation, _ThirdPersonViewCamera.cameraRotateSpeed);
+        camTransform.RotateAround(this.centerStandardObject.transform.position, rotation, this.thirdPersonViewCamera.cameraRotateSpeed);
     }
 }

@@ -24,13 +24,12 @@ public class Player : MonoBehaviour
         set { this.m_ePlayerState = value; }
     }
 
-    public GameManager gameManager;
-    public Rigidbody playerRigidbody;
-
     public float playerMoveSpeed;
 
+    private GameManager m_gameManager;
     private PhysicsWorldManager m_pwManager;
     private WorldSetter m_worldSetter;
+    private Rigidbody m_rigidbody;
 
     private Vector3 m_moveForwardVector;
     private Vector3 m_moveRightVector;
@@ -64,16 +63,18 @@ public class Player : MonoBehaviour
 
     private void InitPlayer()
     {
-        int cgPlayerLayer = LayerMask.NameToLayer("CGPlayer");
-        this.gameObject.layer = cgPlayerLayer;
+        this.gameObject.layer = LayerMask.NameToLayer("CGPlayer");
 
+        this.m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         this.m_pwManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
         this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
+        this.m_rigidbody = this.GetComponent<Rigidbody>();
 
         this.m_playerUpVector = this.transform.up;
         this.m_originQuaternion = this.transform.localRotation;
 
         this.m_playerHeight = this.transform.GetComponent<CapsuleCollider>().height;
+        this.m_maxRaycastDistance = this.m_playerHeight;
 
         SetPlayerDirectionVectors();
     }
@@ -217,7 +218,7 @@ public class Player : MonoBehaviour
         moveVector += this.m_moveRightVector * horizontalSpeed;
         moveVector += this.m_moveForwardVector * verticalSpeed;
 
-        this.playerRigidbody.AddForce(moveVector);
+        this.m_rigidbody.AddForce(moveVector);
     }
 
     public void RotatePlayerObject(float horizontalValue, float verticalValue)
@@ -310,8 +311,7 @@ public class Player : MonoBehaviour
 
         //?? 규태 : 다른 곳에 콜백 만들고 지우기
         SetPlayerStateIdle();
-
-        this.gameManager.SetGameStateThrowing();
+        this.m_gameManager.SetGameStateThrowing();
     }
 }
 

@@ -18,29 +18,29 @@ public class GameManager : MonoBehaviour
         GAME_STATE_OVER,
     }
 
-    public PhysicsWorldManager _PhysicsWorldManager;
+    public PhysicsWorldManager physicsWorldManager;
 
-    public EGameState GameState;
+    public EGameState eGameState;
 
-    public Player[] Players;
-    public GameObject[] PlayerController; //?? 규태 : 서버 통신으로 변경하면 삭제한다.
+    public Player[] playerArray;
+    public GameObject[] playerController; //?? 규태 : 서버 통신으로 변경하면 삭제한다.
 
-    public int GamePlayerCount;
-    public int GameTurnNumber;
+    public int gamePlayerCount;
+    public int gameCurrentTurn;
 
-    public float GameTurnLimitTime;
-    public float GameTurnTime;
+    public float gameTurnLimitTime;
+    public float gameCurrentTurnTime;
 
-    //??
-    public Text FrameText;
-    private float FrameDeltaTime;
+    //?? 규태 : 프레임 체크용. debug 모드에서만 쓰자
+    public Text frameText;
+    private float m_frameDeltaTime;
 
     private void Start()
     {
-        InitializeGameManager();
-
         //?? 규태 : 임시
         Application.targetFrameRate = 60;
+
+        InitGameManager();
         StartGame();
     }
     
@@ -53,37 +53,37 @@ public class GameManager : MonoBehaviour
         UpdateDebugUI();
     }
 
-    //?? 규태 : 우선 고정
-    private void InitializeGameManager()
+    //?? 규태 : 값들 우선으로 고정하고, 추후에 수정한다.
+    private void InitGameManager()
     {
-        _PhysicsWorldManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
+        this.physicsWorldManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
 
-        Players = new Player[2];
-        PlayerController = new GameObject[2];
+        this.playerArray = new Player[2];
+        this.playerController = new GameObject[2];
         for (int i = 0; i < 2; i++)
         {
-            Players[i] = GameObject.Find("Player_" + i).GetComponent<Player>();
-            PlayerController[i] = GameObject.Find("Players").transform.Find("PlayerController_" + i).gameObject;
+            this.playerArray[i] = GameObject.Find("Player_" + i).GetComponent<Player>();
+            this.playerController[i] = GameObject.Find("Players").transform.Find("PlayerController_" + i).gameObject;
         }
 
         // 게임 정보
-        GameState = EGameState.GAME_STATE_PAUSE;
+        this.eGameState = EGameState.GAME_STATE_PAUSE;
 
-        GamePlayerCount = 2;
-        GameTurnNumber = 0;
+        this.gamePlayerCount = 2;
+        this.gameCurrentTurn = 0;
 
-        GameTurnLimitTime = 10000.0f;
+        this.gameTurnLimitTime = 10000.0f;
     }
 
     public void StartGame()
     {
-        GameState = EGameState.GAME_STATE_PLAYING;
+        this.eGameState = EGameState.GAME_STATE_PLAYING;
 
-        GameTurnNumber = 0;
-        GameTurnTime = 0.0f;
+        this.gameCurrentTurn = 0;
+        this.gameCurrentTurnTime = 0.0f;
 
-        Players[GameTurnNumber].PlayerState = Player.EPlayerState.PLAYER_STATE_READY;
-        PlayerController[GameTurnNumber].SetActive(true);
+        this.playerArray[this.gameCurrentTurn].PlayerState = Player.EPlayerState.PLAYER_STATE_READY;
+        this.playerController[this.gameCurrentTurn].SetActive(true);
     }
 
     /*
@@ -91,10 +91,10 @@ public class GameManager : MonoBehaviour
      */
     private void UpdateGameManager()
     {
-        if (GameState != EGameState.GAME_STATE_PLAYING)
+        if (this.eGameState != EGameState.GAME_STATE_PLAYING)
             return;
 
-        GameTurnTime += Time.deltaTime;
+        this.gameCurrentTurnTime += Time.deltaTime;
     }
 
     private void CheckTurnOver()
@@ -109,8 +109,8 @@ public class GameManager : MonoBehaviour
     {
         bool bResult = false;
 
-        if (GameTurnTime >= GameTurnLimitTime ||
-            (GameState == EGameState.GAME_STATE_THROWING && _PhysicsWorldManager.GetObservedObjectCount() == 0))
+        if (this.gameCurrentTurnTime > this.gameTurnLimitTime ||
+            (this.eGameState == EGameState.GAME_STATE_THROWING && physicsWorldManager.GetObservedObjectCount() == 0))
         {
             bResult = true;
         }
@@ -123,48 +123,48 @@ public class GameManager : MonoBehaviour
      */
     public void SetGameStatePlaying()
     {
-        GameState = EGameState.GAME_STATE_PLAYING;
+        this.eGameState = EGameState.GAME_STATE_PLAYING;
     }
 
     public void SetGameStateThrowing()
     {
-        GameState = EGameState.GAME_STATE_THROWING;
+        this.eGameState = EGameState.GAME_STATE_THROWING;
     }
 
     public void SetGameStatePause()
     {
-        GameState = EGameState.GAME_STATE_PAUSE;
+        this.eGameState = EGameState.GAME_STATE_PAUSE;
     }
 
     public void SetGameStateOver()
     {
-        GameState = EGameState.GAME_STATE_OVER;
+        this.eGameState = EGameState.GAME_STATE_OVER;
     }
 
     public void SetGameTurnOver()
     {
         // 턴을 가지고 있던 유저를 disable
-        Players[GameTurnNumber].SetPlayerStateIdle();
-        PlayerController[GameTurnNumber].SetActive(false);
+        this.playerArray[this.gameCurrentTurn].SetPlayerStateIdle();
+        this.playerController[this.gameCurrentTurn].SetActive(false);
 
         // 턴을 다음 유저에게 넘긴다.
-        GameTurnNumber++;
-        if (GameTurnNumber >= GamePlayerCount)
+        this.gameCurrentTurn++;
+        if (this.gameCurrentTurn >= this.gamePlayerCount)
         {
-            GameTurnNumber = 0;
+            this.gameCurrentTurn = 0;
         }
 
-        Players[GameTurnNumber].SetPlayerStateReady();
-        PlayerController[GameTurnNumber].SetActive(true);
+        this.playerArray[this.gameCurrentTurn].SetPlayerStateReady();
+        this.playerController[this.gameCurrentTurn].SetActive(true);
 
 
         // 턴을 초기화 시키고 게임을 다시 진행한다.
-        GameTurnTime = 0.0f;
+        this.gameCurrentTurnTime = 0.0f;
 
         SetGameStatePlaying();
     }
 
-    //?? 규태 : 옮기기
+    //?? 규태 : 다른 스크립트로 옮기기
     public void SceneMove(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
@@ -172,8 +172,8 @@ public class GameManager : MonoBehaviour
 
     private void UpdateDebugUI()
     {
-        FrameDeltaTime += (Time.deltaTime - FrameDeltaTime) * 0.1f;
-        float fps = 1.0f / FrameDeltaTime;
-        FrameText.text = fps.ToString();
+        this.m_frameDeltaTime += (Time.deltaTime - this.m_frameDeltaTime) * 0.1f;
+        float fps = 1.0f / this.m_frameDeltaTime;
+        this.frameText.text = fps.ToString();
     }
 }

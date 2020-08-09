@@ -7,20 +7,20 @@ using System.Reflection;
 
 public class GuiShotController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    const float MaxPointerDownTime = 3.0f;
+    private const float kMaxPointerDownTime = 3.0f;
 
     public bool IsPointerDown
     {
-        get { return isPointerDown; }
-        set { isPointerDown = value; }
+        get { return m_isPointerDown; }
+        set { m_isPointerDown = value; }
     }
 
     public Image IMGStrengthBar;
 
-    [SerializeField] private bool isPointerDown;
+    [SerializeField] private bool m_isPointerDown;
 
-    [SerializeField] private float pointerDownTime;
-    [SerializeField] private float shotStrength;
+    [SerializeField] private float m_pointerDownTime;
+    [SerializeField] private float m_shotStrength;
 
     private void Update()
     {
@@ -33,17 +33,17 @@ public class GuiShotController : MonoBehaviour, IPointerDownHandler, IPointerUpH
      */
     public virtual void OnPointerDown(PointerEventData eventData)
     {
-        InitializePointerData();
+        ResetPointerData();
 
         //?? 규태 : 조이스틱 못 움직이도록 해야함... 게임 오브젝트를 꺼야하나?
 
-        IsPointerDown = true;
+        this.m_isPointerDown = true;
     }
 
     public virtual void OnPointerUp(PointerEventData eventData)
     {
-        Debug.Log("GYUT TEST - SHOTSTRENGTH :" + shotStrength);
-        InitializePointerData();
+        Debug.Log("GYUT TEST - SHOTSTRENGTH :" + m_shotStrength);
+        ResetPointerData();
     }
 
     /*
@@ -51,27 +51,27 @@ public class GuiShotController : MonoBehaviour, IPointerDownHandler, IPointerUpH
      */
     private void UpdatePointerDownTime()
     {
-        if (isPointerDown == false)
+        if (this.m_isPointerDown == false)
             return;
 
-        pointerDownTime += Time.deltaTime;
+        this.m_pointerDownTime += Time.deltaTime;
 
         CalculateShotStrength();
     }
     private void UpdatePointerDownTimeUIBar()
     {
-        IMGStrengthBar.fillAmount = shotStrength;
+        this.IMGStrengthBar.fillAmount = this.m_shotStrength;
     }
 
     /*
      *  INIT
      */
-    private void InitializePointerData()
+    private void ResetPointerData()
     {
-        isPointerDown = false;
-        pointerDownTime = 0.0f;
-        shotStrength = 0.0f;
-        IMGStrengthBar.fillAmount = 0.0f;
+        this.m_isPointerDown = false;
+        this.m_pointerDownTime = 0.0f;
+        this.m_shotStrength = 0.0f;
+        this.IMGStrengthBar.fillAmount = 0.0f;
     }
 
     /*
@@ -80,13 +80,13 @@ public class GuiShotController : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     private void CalculateShotStrength()
     {
-        if (MaxPointerDownTime == 0 || pointerDownTime >= MaxPointerDownTime)
+        if (kMaxPointerDownTime == 0 || this.m_pointerDownTime >= kMaxPointerDownTime)
         {
-            shotStrength = 1.0f;
+            this.m_shotStrength = 1.0f;
         }
         else
         {
-            shotStrength = pointerDownTime / MaxPointerDownTime;
+            this.m_shotStrength = this.m_pointerDownTime / kMaxPointerDownTime;
         }
     }
 }

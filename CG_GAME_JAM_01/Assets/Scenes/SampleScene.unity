@@ -121,6 +121,42 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &422821320 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2001971943, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1281893699 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1893034713037297008, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f051651750a83a54a91e5ad98fa53bba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1952853491 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1694030298335141397, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f051651750a83a54a91e5ad98fa53bba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1893034713003362986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133,11 +169,26 @@ PrefabInstance:
       propertyPath: playerMoveSpeed
       value: 1800
       objectReference: {fileID: 0}
+    - target: {fileID: 1893034712471204543, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1281893699}
     - target: {fileID: 1893034713037297008, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: playerMoveSpeed
       value: 1800
       objectReference: {fileID: 0}
+    - target: {fileID: 1893034713056839927, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1281893699}
+    - target: {fileID: 1893034713387181846, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: frameText
+      value: 
+      objectReference: {fileID: 422821320}
     - target: {fileID: 2256564529122962787, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -198,5 +249,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: DemoMap
       objectReference: {fileID: 0}
+    - target: {fileID: 5915266242291560862, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1952853491}
+    - target: {fileID: 5915266242685887125, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1952853491}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b39c3c849f286514298a4a3a7f1d9fbd, type: 3}

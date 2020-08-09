@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class GuiPlayerViewRotateController : Joystick
 {
-    public Player _Player;
-    public MainCamera _FirstPersonViewCamera;
+    public Player player;
+    public MainCamera firstPersonViewCamera;
 
     public override void PointerDownFunction()
     {
         base.PointerDownFunction();
 
-        RotateCameraOnPlayer(JoystickHorizontalValue, JoystickVerticalValue);
+        RotateCameraOnPlayer(base.JoystickHorizontalValue, base.JoystickVerticalValue);
     }
     public void RotateCameraOnPlayer(float horizontalValue, float verticalValue)
     {
-        Vector3 rotation = _FirstPersonViewCamera.CameraObject.transform.eulerAngles;
-        float horizontalSpeed = -verticalValue * _FirstPersonViewCamera.cameraMoveSpeed;
-        float verticalSpeed = horizontalValue * _FirstPersonViewCamera.cameraMoveSpeed;
+        Vector3 rotation = this.firstPersonViewCamera.cameraObject.transform.eulerAngles;
+        float horizontalSpeed = -verticalValue * this.firstPersonViewCamera.cameraMoveSpeed;
+        float verticalSpeed = horizontalValue * this.firstPersonViewCamera.cameraMoveSpeed;
 
         rotation.x += horizontalSpeed;
         rotation.y += verticalSpeed;
@@ -28,6 +28,6 @@ public class GuiPlayerViewRotateController : Joystick
         quaternion.x = Mathf.Clamp(quaternion.x, -0.25f, 0.25f);
         quaternion.y = Mathf.Clamp(quaternion.y, -0.15f, 0.15f);
 
-        _FirstPersonViewCamera.CameraObject.transform.rotation = Quaternion.Slerp(_FirstPersonViewCamera.CameraObject.transform.rotation, quaternion, 1.5f);
+        this.firstPersonViewCamera.cameraObject.transform.rotation = Quaternion.Slerp(this.firstPersonViewCamera.cameraObject.transform.rotation, quaternion, 1.5f);
     }
 }
