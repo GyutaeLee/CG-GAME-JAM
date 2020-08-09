@@ -1,5 +1,5 @@
-# CG_GAME_JAM_01
-CHAN &amp; GYUT GAME JAM
+# CG-GAME-JAM
+Gyut and Chan's game development project
 
 ​    
 
