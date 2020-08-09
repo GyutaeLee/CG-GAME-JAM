@@ -15,14 +15,14 @@ public class CGObject : MonoBehaviour
         MAX_OBJECT_STATE
     }
 
-    public bool IsMovable;
-    public EObjectState ObjectState;
+    public bool isMovable;
+    public EObjectState eObjectState;
 
     public bool IsPickable()
     {
         bool isPickable = false;
 
-        if (ObjectState == EObjectState.OBJECT_STATE_GROUND && IsMovable == true)
+        if (eObjectState == EObjectState.OBJECT_STATE_GROUND && isMovable == true)
         {
             isPickable = true;
         }

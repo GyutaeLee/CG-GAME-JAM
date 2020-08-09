@@ -25,7 +25,7 @@ public class CGThrowableObject : CGObject
         bool bResult = false;
 
         // 굴러가는 도중에 힘이 다 되어서 멈추었을 때 상태를 변경해준다.
-        if (ObjectState == EObjectState.OBJECT_STATE_ROLLING && IsObjectStop() == true)
+        if (eObjectState == EObjectState.OBJECT_STATE_ROLLING && IsObjectStop() == true)
         {
             SetObjectStateGround();
 
@@ -57,7 +57,7 @@ public class CGThrowableObject : CGObject
     private void OnCollisionEnter(Collision collision)
     {
         // 던져진 도중에 무언가에 부딪히면 굴러가는 상태로 변경한다.
-        if (ObjectState == EObjectState.OBJECT_STATE_THROWN)
+        if (eObjectState == EObjectState.OBJECT_STATE_THROWN)
         {
             SetObjectStateRolling();
         }
@@ -67,7 +67,7 @@ public class CGThrowableObject : CGObject
     {
         base.InitializeCGObject();
 
-        IsMovable = true;
+        isMovable = true;
 
         m_OriginLocalPosition = transform.localPosition;
         m_OriginLocalRotation = transform.localRotation;
@@ -106,7 +106,7 @@ public class CGThrowableObject : CGObject
 
     public void SetObjectStateGround()
     {
-        ObjectState = EObjectState.OBJECT_STATE_GROUND;
+        eObjectState = EObjectState.OBJECT_STATE_GROUND;
 
         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -118,12 +118,12 @@ public class CGThrowableObject : CGObject
 
     public void SetObjectStatePicked()
     {
-        ObjectState = EObjectState.OBJECT_STATE_PICKED;
+        eObjectState = EObjectState.OBJECT_STATE_PICKED;
     }
 
     public void SetObjectStateThrown()
     {
-        ObjectState = EObjectState.OBJECT_STATE_THROWN;
+        eObjectState = EObjectState.OBJECT_STATE_THROWN;
 
         m_Rigidbody.constraints = RigidbodyConstraints.None;
         transform.parent = null;
@@ -131,7 +131,7 @@ public class CGThrowableObject : CGObject
 
     public void SetObjectStateRolling()
     {
-        ObjectState = EObjectState.OBJECT_STATE_ROLLING;
+        eObjectState = EObjectState.OBJECT_STATE_ROLLING;
     }
 
     public void SetCubeAreaGravity(Vector3 v)

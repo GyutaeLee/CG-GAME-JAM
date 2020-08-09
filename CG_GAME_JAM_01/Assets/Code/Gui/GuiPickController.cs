@@ -75,7 +75,7 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         }
 
         // 2. EObjectType이 MOVABLE인지 확인한다.
-        if (hitTransform.GetComponent<CGThrowableObject>().IsMovable == false)
+        if (hitTransform.GetComponent<CGThrowableObject>().isMovable == false)
         {
             return false;
         }

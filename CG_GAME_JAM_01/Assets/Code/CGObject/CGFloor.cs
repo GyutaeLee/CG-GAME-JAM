@@ -8,6 +8,6 @@ public class CGFloor : CGObject
     {
         base.InitializeCGObject();
 
-        IsMovable = false;
+        isMovable = false;
     }
 }
