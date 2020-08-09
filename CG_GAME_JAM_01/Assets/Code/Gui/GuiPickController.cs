@@ -38,7 +38,7 @@ public class GuiPickController : MonoBehaviour, IPointerDownHandler, IPointerUpH
         Transform objectTransform = null;
 
         //?? 규태 : 테스트 코드
-        if (_Player.CanPlayerThrow())
+        if (_Player.CanPlayerThrowObject())
         {
             _Player.ThrowObject(1.0f);
         }

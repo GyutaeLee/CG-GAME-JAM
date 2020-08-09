@@ -20,7 +20,7 @@ public class WorldSetter : MonoBehaviour
     public bool CubeAreaDebuggingEnable = true;
     // GUI
 
-    public enum CubeAreaEnum : uint
+    public enum ECubeArea : uint
     {
         XP, XM,    
         YP, YM,
@@ -73,18 +73,18 @@ public class WorldSetter : MonoBehaviour
     };
 
 
-    private CubeAreaEnum[,,] m_areaEnumLUT = new CubeAreaEnum[3, 3, 3];
+    private ECubeArea[,,] m_areaEnumLUT = new ECubeArea[3, 3, 3];
 
     /*
      * @brief : input은 각 axis에대해 -1, 0, 1이고, 그에 따라 CubeAreaEnum을 던져준다.
      * @details : ex) (1, 0, -1)은 XP_ZM을, (1, 1, -1)은 XP_YP_ZM을 던져준다.
      */
-    private CubeAreaEnum GetCubeAreaEnum(int x, int y, int z)
+    private ECubeArea GetCubeAreaEnum(int x, int y, int z)
     {
         return m_areaEnumLUT[x + 1, y + 1, z + 1];
     }
 
-    public CubeAreaEnum GetCubeAreaEnum(Vector3 WorldPosition)
+    public ECubeArea GetCubeAreaEnum(Vector3 WorldPosition)
     {
         Vector3 cubeWorldPos = m_cubeWorldTransform.position;
         Vector3 cubeWorldExtent = m_cubeWorldTransform.lossyScale / 2f;
@@ -115,7 +115,7 @@ public class WorldSetter : MonoBehaviour
 
     private Bounds[,,] m_areaBound = new Bounds[3, 3, 3];
 
-    public Bounds GetCubeAreaBound(CubeAreaEnum area)
+    public Bounds GetCubeAreaBound(ECubeArea area)
     {
         int x = m_areaEnumToCoordinate[(uint)area, 0];
         int y = m_areaEnumToCoordinate[(uint)area, 1];
@@ -292,41 +292,41 @@ public class WorldSetter : MonoBehaviour
 
     void initCubeAreaSetting()
     {
-        m_areaEnumLUT[0, 0, 0] = CubeAreaEnum.XM_YM_ZM;
-        m_areaEnumLUT[0, 0, 1] = CubeAreaEnum.XM_YM;
-        m_areaEnumLUT[0, 0, 2] = CubeAreaEnum.XM_YM_ZP;
+        m_areaEnumLUT[0, 0, 0] = ECubeArea.XM_YM_ZM;
+        m_areaEnumLUT[0, 0, 1] = ECubeArea.XM_YM;
+        m_areaEnumLUT[0, 0, 2] = ECubeArea.XM_YM_ZP;
 
-        m_areaEnumLUT[0, 1, 0] = CubeAreaEnum.XM_ZM;
-        m_areaEnumLUT[0, 1, 1] = CubeAreaEnum.XM;
-        m_areaEnumLUT[0, 1, 2] = CubeAreaEnum.XM_ZP;
+        m_areaEnumLUT[0, 1, 0] = ECubeArea.XM_ZM;
+        m_areaEnumLUT[0, 1, 1] = ECubeArea.XM;
+        m_areaEnumLUT[0, 1, 2] = ECubeArea.XM_ZP;
 
-        m_areaEnumLUT[0, 2, 0] = CubeAreaEnum.XM_YP_ZM;
-        m_areaEnumLUT[0, 2, 1] = CubeAreaEnum.XM_YP;
-        m_areaEnumLUT[0, 2, 2] = CubeAreaEnum.XM_YP_ZP;
+        m_areaEnumLUT[0, 2, 0] = ECubeArea.XM_YP_ZM;
+        m_areaEnumLUT[0, 2, 1] = ECubeArea.XM_YP;
+        m_areaEnumLUT[0, 2, 2] = ECubeArea.XM_YP_ZP;
 
-        m_areaEnumLUT[1, 0, 0] = CubeAreaEnum.YM_ZM;
-        m_areaEnumLUT[1, 0, 1] = CubeAreaEnum.YM;
-        m_areaEnumLUT[1, 0, 2] = CubeAreaEnum.YM_ZP;
+        m_areaEnumLUT[1, 0, 0] = ECubeArea.YM_ZM;
+        m_areaEnumLUT[1, 0, 1] = ECubeArea.YM;
+        m_areaEnumLUT[1, 0, 2] = ECubeArea.YM_ZP;
 
-        m_areaEnumLUT[1, 1, 0] = CubeAreaEnum.ZM;
-        m_areaEnumLUT[1, 1, 1] = CubeAreaEnum.NONE;
-        m_areaEnumLUT[1, 1, 2] = CubeAreaEnum.ZP;
+        m_areaEnumLUT[1, 1, 0] = ECubeArea.ZM;
+        m_areaEnumLUT[1, 1, 1] = ECubeArea.NONE;
+        m_areaEnumLUT[1, 1, 2] = ECubeArea.ZP;
 
-        m_areaEnumLUT[1, 2, 0] = CubeAreaEnum.YP_ZM;
-        m_areaEnumLUT[1, 2, 1] = CubeAreaEnum.YP;
-        m_areaEnumLUT[1, 2, 2] = CubeAreaEnum.YP_ZP;
+        m_areaEnumLUT[1, 2, 0] = ECubeArea.YP_ZM;
+        m_areaEnumLUT[1, 2, 1] = ECubeArea.YP;
+        m_areaEnumLUT[1, 2, 2] = ECubeArea.YP_ZP;
 
-        m_areaEnumLUT[2, 0, 0] = CubeAreaEnum.XP_YM_ZM;
-        m_areaEnumLUT[2, 0, 1] = CubeAreaEnum.XP_YM;
-        m_areaEnumLUT[2, 0, 2] = CubeAreaEnum.XP_YM_ZP;
+        m_areaEnumLUT[2, 0, 0] = ECubeArea.XP_YM_ZM;
+        m_areaEnumLUT[2, 0, 1] = ECubeArea.XP_YM;
+        m_areaEnumLUT[2, 0, 2] = ECubeArea.XP_YM_ZP;
 
-        m_areaEnumLUT[2, 1, 0] = CubeAreaEnum.XP_ZM;
-        m_areaEnumLUT[2, 1, 1] = CubeAreaEnum.XP;
-        m_areaEnumLUT[2, 1, 2] = CubeAreaEnum.XP_ZP;
+        m_areaEnumLUT[2, 1, 0] = ECubeArea.XP_ZM;
+        m_areaEnumLUT[2, 1, 1] = ECubeArea.XP;
+        m_areaEnumLUT[2, 1, 2] = ECubeArea.XP_ZP;
 
-        m_areaEnumLUT[2, 2, 0] = CubeAreaEnum.XP_YP_ZM;
-        m_areaEnumLUT[2, 2, 1] = CubeAreaEnum.XP_YP;
-        m_areaEnumLUT[2, 2, 2] = CubeAreaEnum.XP_YP_ZP;
+        m_areaEnumLUT[2, 2, 0] = ECubeArea.XP_YP_ZM;
+        m_areaEnumLUT[2, 2, 1] = ECubeArea.XP_YP;
+        m_areaEnumLUT[2, 2, 2] = ECubeArea.XP_YP_ZP;
 
         const float cubeAreaAlphaValue = 0.3f;
 
@@ -342,118 +342,118 @@ public class WorldSetter : MonoBehaviour
             m_cubeAreaObject[i] = GameObject.Instantiate(cubeAreaPrefab, m_cubeAreaParent.transform);
         }
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP], 
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP], 
             "CubeArea_X+",
             new Vector3(1f, 0f, 0f), 
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM],
             "CubeArea_X-",
             new Vector3(-1f, 0f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP],
             "CubeArea_Y+",
             new Vector3(0f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM],
             "CubeArea_Y-",
             new Vector3(0f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.ZP],
             "CubeArea_Z+",
             new Vector3(0f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.ZM],
             "CubeArea_Z-",
             new Vector3(0f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP],
             "CubeArea_X+Y+",
             new Vector3(1f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM],
             "CubeArea_X+Y-",
             new Vector3(1f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP],
             "CubeArea_X-Y+",
             new Vector3(-1f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM],
             "CubeArea_X-Y-",
             new Vector3(-1f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_ZP],
             "CubeArea_X+Z+",
             new Vector3(1f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_ZM],
             "CubeArea_X-Z+",
             new Vector3(1f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_ZP],
             "CubeArea_X-Z+",
             new Vector3(-1f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_ZM],
             "CubeArea_X-Z-",
             new Vector3(-1f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YP_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP_ZP],
             "CubeArea_Y+Z+",
             new Vector3(0f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YP_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP_ZM],
             "CubeArea_Y-Z+",
             new Vector3(0f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YM_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM_ZP],
             "CubeArea_Y-Z+",
             new Vector3(0f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.YM_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM_ZM],
             "CubeArea_Y-Z-",
             new Vector3(0f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
@@ -461,52 +461,52 @@ public class WorldSetter : MonoBehaviour
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
 
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YP_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZP],
             "CubeArea_X+Y+Z+",
             new Vector3(1f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YP_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZM],
             "CubeArea_X+Y+Z-",
             new Vector3(1f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YM_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZP],
             "CubeArea_X+Y-Z+",
             new Vector3(1f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XP_YM_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZM],
             "CubeArea_X+Y-Z-",
             new Vector3(1f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YP_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZP],
             "CubeArea_X-Y+Z+",
             new Vector3(-1f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YP_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZM],
             "CubeArea_X-Y+Z-",
             new Vector3(-1f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YM_ZP],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZP],
             "CubeArea_X-Y-Z+",
             new Vector3(-1f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)CubeAreaEnum.XM_YM_ZM],
+        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZM],
             "CubeArea_X-Y-Z-",
             new Vector3(-1f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
@@ -515,7 +515,7 @@ public class WorldSetter : MonoBehaviour
 
         for (int i = 0; i < m_cubeAreaObject.Length; ++i)
         {
-            CubeAreaEnum ae = (CubeAreaEnum)i;
+            ECubeArea ae = (ECubeArea)i;
 
             int x = m_areaEnumToCoordinate[i, 0] + 1;
             int y = m_areaEnumToCoordinate[i, 1] + 1;

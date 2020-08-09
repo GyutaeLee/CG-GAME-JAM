@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.XR.WSA.Input;
 
 public class PhysicsWorldManager : MonoBehaviour
 {
-    const float kLaunchPower = 30f;
-    private WorldSetter m_worldSetter;
+    private const float kLaunchPower = 30f;
+
     private class CGPhysicsObject
     {
         public enum EObjectState
@@ -14,204 +16,248 @@ public class PhysicsWorldManager : MonoBehaviour
             OBJECT_MOVING,
             OBJECT_TARGET_AREA
         }
+               
+        public WorldSetter.ECubeArea ePreviousArea;
+        public WorldSetter.ECubeArea eCurrentArea;
+        public WorldSetter.ECubeArea eTargetArea;
+        public EObjectState eObjectState;
+
+        public CGThrowableObject throwableObject;
+        public Rigidbody objectRigidBody;
+
+        public Vector3 launchDirection;
+        public float launchPower;
+        public bool isAreaChanged;
 
         public CGPhysicsObject(CGThrowableObject o, Vector3 d, float p, WorldSetter ws)
         {
-            WorldSetter.CubeAreaEnum ae = ws.GetCubeAreaEnum(o.transform.position);
+            WorldSetter.ECubeArea ae = ws.GetCubeAreaEnum(o.transform.position);
 
-            previousArea = ae;
-            currentArea = ae;
-            targetArea = WorldSetter.CubeAreaEnum.NONE;
-            isAreaChanged = false;
-            state = EObjectState.OBJECT_LAUNCH_TRIGGER;
-            obj = o;
-            rb = obj.GetComponent<Rigidbody>();
-            direction = d;
-            power = p;
+            this.ePreviousArea = ae;
+            this.eCurrentArea = ae;
+            this.eTargetArea = WorldSetter.ECubeArea.NONE;
+            this.eObjectState = EObjectState.OBJECT_LAUNCH_TRIGGER;
+
+            this.throwableObject = o;
+            this.objectRigidBody = this.throwableObject.GetComponent<Rigidbody>();
+
+            this.launchDirection = d;
+            this.launchPower = p;
+            this.isAreaChanged = false;
         }
-
-        public WorldSetter.CubeAreaEnum previousArea;
-        public WorldSetter.CubeAreaEnum currentArea;
-        public WorldSetter.CubeAreaEnum targetArea;
-        public bool isAreaChanged;
-        public EObjectState state;
-        public CGThrowableObject obj;
-        public Rigidbody rb;
-        public Vector3 direction;
-        public float power;
     }
 
-    Vector3[] m_cubeAreaGravity = new Vector3[6];
+    private WorldSetter m_worldSetter;
+    private WorldSetter.ECubeArea[,] m_targetArea;
 
-    List<CGPhysicsObject> m_objects = new List<CGPhysicsObject>();
-    public void LaunchCGObject(CGThrowableObject obj, Vector3 direction, float power)
+    private Vector3[] m_cubeAreaGravity;
+    private Vector3[,] m_forceSpace; //?? 찬행 : 확인 후 지우기
+
+    private bool[,] m_isValidAreaChange;
+
+    private List<CGPhysicsObject> m_objects;
+
+    private void InitPhysicsWorldManager()
     {
-        CGPhysicsObject a = new CGPhysicsObject(obj, direction, power, m_worldSetter);
+        this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
 
-        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(a.obj.transform.position);
-        Vector3 startGravity = m_cubeAreaGravity[(uint)ae];
-
-        a.obj.SetCubeAreaGravity(startGravity);
-        m_objects.Add(a);
-    }
-
-    public int GetObservedObjectCount()
-    {
-        return m_objects.Count;
-    }
-
-    bool[,] m_canAreaChange = new bool[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
-    Vector3[,] m_forceSpace = new Vector3[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
-    WorldSetter.CubeAreaEnum[,] m_targetArea = new WorldSetter.CubeAreaEnum[(uint)WorldSetter.CubeAreaEnum.NONE, (uint)WorldSetter.CubeAreaEnum.NONE];
-
-    void SetAreaInfo(WorldSetter.CubeAreaEnum from, WorldSetter.CubeAreaEnum to, Vector3 force, WorldSetter.CubeAreaEnum target)
-    {
-        m_canAreaChange[(uint)from, (uint)to] = true;
-        m_forceSpace[(uint)from, (uint)to] = force;
-        m_targetArea[(uint)from, (uint)to] = target;
-    }
-
-    void Start()
-    {
-        m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
+        // 동적 할당
+        this.m_targetArea = new WorldSetter.ECubeArea[(uint)WorldSetter.ECubeArea.NONE, (uint)WorldSetter.ECubeArea.NONE];
+        this.m_cubeAreaGravity = new Vector3[6];
+        this.m_forceSpace = new Vector3[(uint)WorldSetter.ECubeArea.NONE, (uint)WorldSetter.ECubeArea.NONE];
+        this.m_isValidAreaChange = new bool[(uint)WorldSetter.ECubeArea.NONE, (uint)WorldSetter.ECubeArea.NONE];
+        this.m_objects = new List<CGPhysicsObject>();
 
         // 초기화
-        for (int i = 0; i < (uint)WorldSetter.CubeAreaEnum.NONE; ++i)
+        for (int i = 0; i < (uint)WorldSetter.ECubeArea.NONE; ++i)
         {
-            for (int j = 0; j < (uint)WorldSetter.CubeAreaEnum.NONE; ++j)
+            for (int j = 0; j < (uint)WorldSetter.ECubeArea.NONE; ++j)
             {
-                m_canAreaChange[i, j] = false;
-                m_forceSpace[i, j] = new Vector3(0f, 0f, 0f);
-                m_targetArea[i, j] = WorldSetter.CubeAreaEnum.NONE;
+                this.m_isValidAreaChange[i, j] = false;
+                this.m_forceSpace[i, j] = new Vector3(0f, 0f, 0f);
+                this.m_targetArea[i, j] = WorldSetter.ECubeArea.NONE;
             }
         }
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_YP, Vector3.left, WorldSetter.CubeAreaEnum.YP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_YM, Vector3.left, WorldSetter.CubeAreaEnum.YM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_ZP, Vector3.left, WorldSetter.CubeAreaEnum.ZP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XP, WorldSetter.CubeAreaEnum.XP_ZM, Vector3.left, WorldSetter.CubeAreaEnum.ZM);
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_YP, Vector3.right, WorldSetter.CubeAreaEnum.YP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_YM, Vector3.right, WorldSetter.CubeAreaEnum.YM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_ZP, Vector3.right, WorldSetter.CubeAreaEnum.ZP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.XM, WorldSetter.CubeAreaEnum.XM_ZM, Vector3.right, WorldSetter.CubeAreaEnum.ZM);
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.XP_YP, Vector3.down, WorldSetter.CubeAreaEnum.XP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.XM_YP, Vector3.down, WorldSetter.CubeAreaEnum.XM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.YP_ZP, Vector3.down, WorldSetter.CubeAreaEnum.ZP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YP, WorldSetter.CubeAreaEnum.YP_ZM, Vector3.down, WorldSetter.CubeAreaEnum.ZM);
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.XP_YM, Vector3.up, WorldSetter.CubeAreaEnum.XP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.XM_YM, Vector3.up, WorldSetter.CubeAreaEnum.XM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.YM_ZP, Vector3.up, WorldSetter.CubeAreaEnum.ZP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.YM, WorldSetter.CubeAreaEnum.YM_ZM, Vector3.up, WorldSetter.CubeAreaEnum.ZM);
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.XP_ZP, Vector3.back, WorldSetter.CubeAreaEnum.XP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.XM_ZP, Vector3.back, WorldSetter.CubeAreaEnum.XM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.YP_ZP, Vector3.back, WorldSetter.CubeAreaEnum.YP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZP, WorldSetter.CubeAreaEnum.YM_ZP, Vector3.back, WorldSetter.CubeAreaEnum.YM);
-
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.XP_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.XP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.XM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.XM);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YP_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YP);
-        SetAreaInfo(WorldSetter.CubeAreaEnum.ZM, WorldSetter.CubeAreaEnum.YM_ZM, Vector3.forward, WorldSetter.CubeAreaEnum.YM);
-
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.XP] = Vector3.left * Physics.gravity.magnitude;
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.XM] = Vector3.right* Physics.gravity.magnitude;
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.YP] = Vector3.down * Physics.gravity.magnitude;
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.YM] = Vector3.up * Physics.gravity.magnitude;
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.ZP] = Vector3.back * Physics.gravity.magnitude;
-        m_cubeAreaGravity[(uint)WorldSetter.CubeAreaEnum.ZM] = Vector3.forward * Physics.gravity.magnitude;
     }
 
-    private void FixedUpdate()
+    private void SetAreaInfo(WorldSetter.ECubeArea from, WorldSetter.ECubeArea to, Vector3 force, WorldSetter.ECubeArea target)
     {
-        for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
+        this.m_isValidAreaChange[(uint)from, (uint)to] = true;
+        this.m_forceSpace[(uint)from, (uint)to] = force;
+        this.m_targetArea[(uint)from, (uint)to] = target;
+    }
+
+    private void InitAreaInfo()
+    {
+        SetAreaInfo(WorldSetter.ECubeArea.XP, WorldSetter.ECubeArea.XP_YP, Vector3.left, WorldSetter.ECubeArea.YP);
+        SetAreaInfo(WorldSetter.ECubeArea.XP, WorldSetter.ECubeArea.XP_YM, Vector3.left, WorldSetter.ECubeArea.YM);
+        SetAreaInfo(WorldSetter.ECubeArea.XP, WorldSetter.ECubeArea.XP_ZP, Vector3.left, WorldSetter.ECubeArea.ZP);
+        SetAreaInfo(WorldSetter.ECubeArea.XP, WorldSetter.ECubeArea.XP_ZM, Vector3.left, WorldSetter.ECubeArea.ZM);
+
+        SetAreaInfo(WorldSetter.ECubeArea.XM, WorldSetter.ECubeArea.XM_YP, Vector3.right, WorldSetter.ECubeArea.YP);
+        SetAreaInfo(WorldSetter.ECubeArea.XM, WorldSetter.ECubeArea.XM_YM, Vector3.right, WorldSetter.ECubeArea.YM);
+        SetAreaInfo(WorldSetter.ECubeArea.XM, WorldSetter.ECubeArea.XM_ZP, Vector3.right, WorldSetter.ECubeArea.ZP);
+        SetAreaInfo(WorldSetter.ECubeArea.XM, WorldSetter.ECubeArea.XM_ZM, Vector3.right, WorldSetter.ECubeArea.ZM);
+
+        SetAreaInfo(WorldSetter.ECubeArea.YP, WorldSetter.ECubeArea.XP_YP, Vector3.down, WorldSetter.ECubeArea.XP);
+        SetAreaInfo(WorldSetter.ECubeArea.YP, WorldSetter.ECubeArea.XM_YP, Vector3.down, WorldSetter.ECubeArea.XM);
+        SetAreaInfo(WorldSetter.ECubeArea.YP, WorldSetter.ECubeArea.YP_ZP, Vector3.down, WorldSetter.ECubeArea.ZP);
+        SetAreaInfo(WorldSetter.ECubeArea.YP, WorldSetter.ECubeArea.YP_ZM, Vector3.down, WorldSetter.ECubeArea.ZM);
+
+        SetAreaInfo(WorldSetter.ECubeArea.YM, WorldSetter.ECubeArea.XP_YM, Vector3.up, WorldSetter.ECubeArea.XP);
+        SetAreaInfo(WorldSetter.ECubeArea.YM, WorldSetter.ECubeArea.XM_YM, Vector3.up, WorldSetter.ECubeArea.XM);
+        SetAreaInfo(WorldSetter.ECubeArea.YM, WorldSetter.ECubeArea.YM_ZP, Vector3.up, WorldSetter.ECubeArea.ZP);
+        SetAreaInfo(WorldSetter.ECubeArea.YM, WorldSetter.ECubeArea.YM_ZM, Vector3.up, WorldSetter.ECubeArea.ZM);
+
+        SetAreaInfo(WorldSetter.ECubeArea.ZP, WorldSetter.ECubeArea.XP_ZP, Vector3.back, WorldSetter.ECubeArea.XP);
+        SetAreaInfo(WorldSetter.ECubeArea.ZP, WorldSetter.ECubeArea.XM_ZP, Vector3.back, WorldSetter.ECubeArea.XM);
+        SetAreaInfo(WorldSetter.ECubeArea.ZP, WorldSetter.ECubeArea.YP_ZP, Vector3.back, WorldSetter.ECubeArea.YP);
+        SetAreaInfo(WorldSetter.ECubeArea.ZP, WorldSetter.ECubeArea.YM_ZP, Vector3.back, WorldSetter.ECubeArea.YM);
+
+        SetAreaInfo(WorldSetter.ECubeArea.ZM, WorldSetter.ECubeArea.XP_ZM, Vector3.forward, WorldSetter.ECubeArea.XP);
+        SetAreaInfo(WorldSetter.ECubeArea.ZM, WorldSetter.ECubeArea.XM_ZM, Vector3.forward, WorldSetter.ECubeArea.XM);
+        SetAreaInfo(WorldSetter.ECubeArea.ZM, WorldSetter.ECubeArea.YP_ZM, Vector3.forward, WorldSetter.ECubeArea.YP);
+        SetAreaInfo(WorldSetter.ECubeArea.ZM, WorldSetter.ECubeArea.YM_ZM, Vector3.forward, WorldSetter.ECubeArea.YM);
+    }
+
+    private void InitCubeAreaGravity()
+    {
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.XP] = Vector3.left * Physics.gravity.magnitude;
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.XM] = Vector3.right * Physics.gravity.magnitude;
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.YP] = Vector3.down * Physics.gravity.magnitude;
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.YM] = Vector3.up * Physics.gravity.magnitude;
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.ZP] = Vector3.back * Physics.gravity.magnitude;
+        this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.ZM] = Vector3.forward * Physics.gravity.magnitude;
+    }
+
+    private void DoObjectLaunchTrigger(int objectIndex)
+    {
+        Vector3 launchForce = this.m_objects[objectIndex].launchDirection * this.m_objects[objectIndex].launchPower * kLaunchPower;
+        this.m_objects[objectIndex].throwableObject.SetLayerAsThrown();  // Preventing CGThrowableObject from colliding with world barrier planes
+        this.m_objects[objectIndex].objectRigidBody.AddForce(launchForce);
+        this.m_objects[objectIndex].eObjectState = CGPhysicsObject.EObjectState.OBJECT_MOVING;
+    }
+
+    private void DoObjectMoving(int objectIndex)
+    {
+        WorldSetter.ECubeArea eCubeArea = this.m_worldSetter.GetCubeAreaEnum(this.m_objects[objectIndex].throwableObject.transform.position);
+        Bounds areaWorldBound = this.m_worldSetter.GetCubeAreaBound(eCubeArea);
+        Bounds objWorldBound = this.m_objects[objectIndex].throwableObject.GetComponent<Renderer>().bounds;
+        bool isInside = WorldSetter.IsAInsideB(objWorldBound.min, objWorldBound.max, areaWorldBound.min, areaWorldBound.max);
+
+        // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
+        // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
+        if (this.m_objects[objectIndex].isAreaChanged == true)
         {
-            switch (m_objects[objectIndex].state)
+            // 해당 target area에 넘어왔고, bound box가 완전히 들어왔다면
+            // Layer 설정을 바꾸어서 plane과 충돌처리 되게 한다.
+            if (this.m_objects[objectIndex].eTargetArea == eCubeArea && isInside)
+            {
+                this.m_objects[objectIndex].eObjectState = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
+                this.m_objects[objectIndex].throwableObject.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
+
+                // 해당 지역의 gravity로 설정해준다.
+                Vector3 targetGravity = this.m_cubeAreaGravity[(uint)eCubeArea];
+                this.m_objects[objectIndex].throwableObject.SetCubeAreaGravity(targetGravity);
+            }
+        }
+        else if (this.m_objects[objectIndex].eCurrentArea != eCubeArea)
+        {
+            // 해당 넘어가는 지역으로 완전히 들어 갔으면, Area Changed를 true로 해주고,
+            // 해당 지역의 Force를 넘겨준다.
+            if (isInside == true)
+            {
+                this.m_objects[objectIndex].isAreaChanged = true;
+                this.m_objects[objectIndex].ePreviousArea = m_objects[objectIndex].eCurrentArea;
+                this.m_objects[objectIndex].eCurrentArea = eCubeArea;
+                this.m_objects[objectIndex].eTargetArea = m_targetArea[(uint)m_objects[objectIndex].ePreviousArea, (uint)m_objects[objectIndex].eCurrentArea];
+
+                if (true == this.m_isValidAreaChange[(uint)m_objects[objectIndex].ePreviousArea, (uint)m_objects[objectIndex].eCurrentArea])
+                {
+                    // 다른 지역으로 넘어갔다.
+                }
+                else
+                {
+                    // PutBack the Throwable Object
+                    this.m_objects[objectIndex].throwableObject.ResetObject();
+                    this.m_objects.RemoveAt(objectIndex);
+                }
+            }
+        }
+    }
+
+    private void FixedUpdatePhysicsWorld()
+    {
+        for (int objectIndex = 0; objectIndex < this.m_objects.Count; ++objectIndex)
+        {
+            switch (this.m_objects[objectIndex].eObjectState)
             {
                 case CGPhysicsObject.EObjectState.OBJECT_LAUNCH_TRIGGER:
                     {
-                        Vector3 launchForce = m_objects[objectIndex].direction * m_objects[objectIndex].power * kLaunchPower;
-                        m_objects[objectIndex].obj.SetLayerAsThrown();  // Preventing CGThrowableObject from colliding with world barrier planes
-                        m_objects[objectIndex].rb.AddForce(launchForce);
-                        m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_MOVING;
+                        DoObjectLaunchTrigger(objectIndex);
                         break;
                     }
                 case CGPhysicsObject.EObjectState.OBJECT_MOVING:
                     {
-                        WorldSetter.CubeAreaEnum ae = m_worldSetter.GetCubeAreaEnum(m_objects[objectIndex].obj.transform.position);
-                        Bounds areaWorldBound = m_worldSetter.GetCubeAreaBound(ae);
-                        Bounds objWorldBound = m_objects[objectIndex].obj.GetComponent<Renderer>().bounds;
-                        bool isInside = WorldSetter.IsAInsideB(objWorldBound.min, objWorldBound.max, areaWorldBound.min, areaWorldBound.max);
-
-                        // Area가 한 번 바뀌었으므로, Target으로 가는 중이다.
-                        // Target Area에 있다면, TARGET_AREA state로 바꾸고, Update() 함수에서 없애준다.
-                        if (m_objects[objectIndex].isAreaChanged == true)
-                        {
-                            // 해당 target area에 넘어왔고, bound box가 완전히 들어왔다면
-                            // Layer 설정을 바꾸어서 plane과 충돌처리 되게 한다.
-                            if (m_objects[objectIndex].targetArea == ae && isInside)
-                            {
-                                m_objects[objectIndex].state = CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA;
-                                m_objects[objectIndex].obj.SetLayerAsInArea();  // In order to make CGThrowableObject collide with world barrier planes
-
-                                // 해당 지역의 gravity로 설정해준다.
-                                Vector3 targetGravity = m_cubeAreaGravity[(uint)ae];
-                                m_objects[objectIndex].obj.SetCubeAreaGravity(targetGravity);
-                            }
-
-                            continue;
-                        }
-
-                        if (m_objects[objectIndex].currentArea != ae)
-                        {
-                            // 해당 넘어가는 지역으로 완전히 들어 갔으면, Area Changed를 true로 해주고,
-                            // 해당 지역의 Force를 넘겨준다.
-                            if(isInside)
-                            {
-                                m_objects[objectIndex].isAreaChanged = true;
-                                m_objects[objectIndex].previousArea = m_objects[objectIndex].currentArea;
-                                m_objects[objectIndex].currentArea = ae;
-                                m_objects[objectIndex].targetArea = m_targetArea[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea];
-
-                                if (m_canAreaChange[(uint)m_objects[objectIndex].previousArea, (uint)m_objects[objectIndex].currentArea] == true)
-                                {
-                                    // 다른 지역으로 넘어갔다.
-                                }
-                                else
-                                {
-                                    // PutBack the Throwable Object
-                                    m_objects[objectIndex].obj.ResetObject();
-                                    m_objects.RemoveAt(objectIndex);
-                                }
-                            }
-                        }
-
+                        DoObjectMoving(objectIndex);
                         break;
                     }
             }
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void UpdatePhysicsWorld()
     {
-        for (int objectIndex = 0; objectIndex < m_objects.Count; ++objectIndex)
+        for (int objectIndex = 0; objectIndex < this.m_objects.Count; ++objectIndex)
         {
-            switch (m_objects[objectIndex].state)
+            //switch (m_objects[objectIndex].eObjectState)
+            //{
+            //    case CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA:
+            //        {
+
+            // 해당 area에 맞는 gravity 설정
+            if (this.m_objects[objectIndex].throwableObject.GetComponent<CGThrowableObject>().CheckAndChangeObjectState() == true)
             {
-                case CGPhysicsObject.EObjectState.OBJECT_TARGET_AREA:
-                    {
-                        // 해당 area에 맞는 gravity 설정
-                        if (m_objects[objectIndex].obj.GetComponent<CGThrowableObject>().CheckAndChangeObjectState() == true)
-                        {
-                            // 업데이트 할 PhysicsObject Array에서 제거
-                            m_objects.RemoveAt(objectIndex);
-                        }
-                        break;
-                    }
+                // 업데이트 할 PhysicsObject Array에서 제거
+                this.m_objects.RemoveAt(objectIndex);
             }
+
+            //            break;
+            //        }
+            //}
         }
+    }
+
+    private void Start()
+    {
+        InitPhysicsWorldManager();
+        InitAreaInfo();
+        InitCubeAreaGravity();
+    }
+
+    private void FixedUpdate()
+    {
+        FixedUpdatePhysicsWorld();
+    }
+
+    private void Update()
+    {
+        UpdatePhysicsWorld();
+    }
+
+    public void LaunchCGObject(CGThrowableObject obj, Vector3 direction, float power)
+    {
+        CGPhysicsObject physicsObj = new CGPhysicsObject(obj, direction, power, this.m_worldSetter);
+
+        WorldSetter.ECubeArea eCubeArea = this.m_worldSetter.GetCubeAreaEnum(physicsObj.throwableObject.transform.position);
+        Vector3 startGravity = this.m_cubeAreaGravity[(uint)eCubeArea];
+
+        physicsObj.throwableObject.SetCubeAreaGravity(startGravity);
+        this.m_objects.Add(physicsObj);
+    }
+
+    public int GetObservedObjectCount()
+    {
+        return this.m_objects.Count;
     }
 }

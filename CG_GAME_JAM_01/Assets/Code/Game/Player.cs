@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    private const int kAreaCount = 6;
+
     public enum EPlayerState
     {
         PLAYER_STATE_NONE   = 0,
@@ -18,80 +20,77 @@ public class Player : MonoBehaviour
 
     public EPlayerState PlayerState
     { 
-        get { return m_PlayerState; }
-        set { m_PlayerState = value; }
+        get { return this.m_ePlayerState; }
+        set { this.m_ePlayerState = value; }
     }
 
-    public GameManager _GameManager;
+    public GameManager gameManager;
+    public Rigidbody playerRigidbody;
 
-    private PhysicsWorldManager PWManager;
-    private WorldSetter _WorldSetter;
+    public float playerMoveSpeed;
 
-    public GameObject PlayerObject;
-    public Rigidbody PlayerRigidbody;
+    private PhysicsWorldManager m_pwManager;
+    private WorldSetter m_worldSetter;
 
-    public float playerMoveSpeed = 0.01f;
+    private Vector3 m_moveForwardVector;
+    private Vector3 m_moveRightVector;
 
-    private const int m_AreaCount = 6;
-    private Vector3 m_MoveForwardVectors;
-    private Vector3 m_MoveRightVectors;
+    private Vector3 m_playerUpVector;
+    private Quaternion m_originQuaternion;
 
-    private Vector3 m_PlayerUpVector;
-    private Quaternion m_OriginQuaternion;
+    private WorldSetter.ECubeArea m_eCubeArea;
 
-    private WorldSetter.CubeAreaEnum m_ECubeArea;
+    private Vector3 m_playerRayPosition;
+    private RaycastHit m_raycastHit;
 
-    private Vector3 m_PlayerRayVector;
-    private RaycastHit m_RaycastHit;
-    private float m_PlayerHeight;
-    private float m_MaxRaycastDistance = 0.3f;
+    private bool m_isRaycastHit;
 
-    private GameObject m_PickUpObject;
+    private float m_playerHeight;
+    private float m_maxRaycastDistance;
 
-    private EPlayerState m_PlayerState;
+    private GameObject m_pickUpObject;
+
+    private EPlayerState m_ePlayerState;
 
     private void Start()
     {
-        InitializePlayer();
+        InitPlayer();
     }
 
     private void Update()
     {
         UpdatePlayer();
-
-        DebugDrawRay();
     }
 
-    private void InitializePlayer()
+    private void InitPlayer()
     {
         int cgPlayerLayer = LayerMask.NameToLayer("CGPlayer");
-        gameObject.layer = cgPlayerLayer;
+        this.gameObject.layer = cgPlayerLayer;
 
-        PWManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
-        _WorldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
+        this.m_pwManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
+        this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
 
-        m_PlayerUpVector = PlayerObject.transform.up;
-        m_OriginQuaternion = PlayerObject.transform.localRotation;
+        this.m_playerUpVector = this.transform.up;
+        this.m_originQuaternion = this.transform.localRotation;
 
-        m_PlayerHeight = PlayerObject.transform.GetComponent<CapsuleCollider>().height;
+        this.m_playerHeight = this.transform.GetComponent<CapsuleCollider>().height;
 
         SetPlayerDirectionVectors();
     }
 
     private void SetPlayerDirectionVectors()
     {
-        m_ECubeArea = _WorldSetter.GetCubeAreaEnum(PlayerObject.transform.position);
+        this.m_eCubeArea = this.m_worldSetter.GetCubeAreaEnum(this.transform.position);
 
-        switch (m_ECubeArea)
+        switch (this.m_eCubeArea)
         {
-            case WorldSetter.CubeAreaEnum.YP:
-                m_MoveForwardVectors = Vector3.forward;
-                m_MoveRightVectors = Vector3.right;
+            case WorldSetter.ECubeArea.YP:
+                this.m_moveForwardVector = Vector3.forward;
+                this.m_moveRightVector = Vector3.right;
                 break;
-            case WorldSetter.CubeAreaEnum.ZM:
-
-                m_MoveForwardVectors = Vector3.up;
-                m_MoveRightVectors = Vector3.right;
+            case WorldSetter.ECubeArea.ZM:
+                this.m_moveForwardVector = Vector3.up;
+                this.m_moveRightVector = Vector3.right;
                 break;
             default:
                 break;
@@ -100,16 +99,25 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        Vector3 rayVector = PlayerObject.transform.position;
+        Vector3 rayVector = this.transform.position;
 
-        rayVector.y += m_PlayerHeight * 0.5f * PlayerObject.transform.localScale.y;
+        rayVector += this.m_playerUpVector * (this.m_playerHeight * 0.5f * this.transform.localScale.y);
 
-        m_PlayerRayVector = rayVector;
+        this.m_playerRayPosition = rayVector;
     }
 
-    private void DebugDrawRay()
+    private void OnDrawGizmos()
     {
-        Debug.DrawRay(m_PlayerRayVector, PlayerObject.transform.forward * m_MaxRaycastDistance, Color.blue, 0.3f);
+        if (this.m_isRaycastHit == true)
+        {
+            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_raycastHit.distance);
+            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.transform.lossyScale);
+        }
+        else
+        {
+            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_maxRaycastDistance);
+            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_maxRaycastDistance, this.transform.lossyScale);
+        }
     }
 
     private float AddQuadrantValue(float x, float y)
@@ -142,39 +150,41 @@ public class Player : MonoBehaviour
 
     public void SetPlayerStateIdle()
     {
-        PlayerState = EPlayerState.PLAYER_STATE_IDLE;
+        this.m_ePlayerState = EPlayerState.PLAYER_STATE_IDLE;
 
         // 들고 있다가 턴이 끝났을 때
-        if (m_PickUpObject != null)
+        if (this.m_pickUpObject != null)
         {
-            m_PickUpObject.GetComponent<CGThrowableObject>().ResetObject();
-            m_PickUpObject.transform.parent = null;
-            m_PickUpObject = null;
+            this.m_pickUpObject.GetComponent<CGThrowableObject>().ResetObject();
+            this.m_pickUpObject.transform.parent = null;
+            this.m_pickUpObject = null;
         }
+
+        this.m_isRaycastHit = false;
     }
 
     public void SetPlayerStateReady()
     {
-        PlayerState = EPlayerState.PLAYER_STATE_READY;
-        m_PickUpObject = null;
+        this.m_ePlayerState = EPlayerState.PLAYER_STATE_READY;
+        this.m_pickUpObject = null;
     }
 
     public void SetPlayerStatePick(Transform objectTransform)
     {
-        PlayerState = EPlayerState.PLAYER_STATE_PICK;
+        this.m_ePlayerState = EPlayerState.PLAYER_STATE_PICK;
 
-        m_PickUpObject = objectTransform.gameObject;
+        this.m_pickUpObject = objectTransform.gameObject;
     }
 
     public void SetPlayerStateThrow()
     {
-        PlayerState = EPlayerState.PLAYER_STATE_THROW;
-        m_PickUpObject = null;
+        this.m_ePlayerState = EPlayerState.PLAYER_STATE_THROW;
+        this.m_pickUpObject = null;
     }
 
-    public bool CanPlayerPick()
+    public bool CanPlayerPickObject()
     {
-        if (PlayerState != EPlayerState.PLAYER_STATE_READY)
+        if (this.m_ePlayerState != EPlayerState.PLAYER_STATE_READY)
         {
             return false;
         }
@@ -182,9 +192,9 @@ public class Player : MonoBehaviour
         return true;
     }
 
-    public bool CanPlayerThrow()
+    public bool CanPlayerThrowObject()
     {
-        if (PlayerState != EPlayerState.PLAYER_STATE_PICK)
+        if (this.m_ePlayerState != EPlayerState.PLAYER_STATE_PICK)
         {
             return false;
         }
@@ -200,14 +210,14 @@ public class Player : MonoBehaviour
         if (horizontalValue == 0 && verticalValue == 0)
             return;
 
-        float horizontalSpeed = horizontalValue * playerMoveSpeed * Time.deltaTime;
-        float verticalSpeed   = verticalValue * playerMoveSpeed * Time.deltaTime;
+        float horizontalSpeed = horizontalValue * this.playerMoveSpeed * Time.deltaTime;
+        float verticalSpeed   = verticalValue * this.playerMoveSpeed * Time.deltaTime;
         Vector3 moveVector = Vector3.zero;
 
-        moveVector += m_MoveRightVectors * horizontalSpeed;
-        moveVector += m_MoveForwardVectors * verticalSpeed;
+        moveVector += this.m_moveRightVector * horizontalSpeed;
+        moveVector += this.m_moveForwardVector * verticalSpeed;
 
-        PlayerRigidbody.AddForce(moveVector);
+        this.playerRigidbody.AddForce(moveVector);
     }
 
     public void RotatePlayerObject(float horizontalValue, float verticalValue)
@@ -232,7 +242,7 @@ public class Player : MonoBehaviour
         rotateAngle -= 90.0f;
 
         // 플레이어 오브젝트의 up 벡터를 기준으로 절대 각도 '-' (반시계방향으로 변경) 회전
-        PlayerObject.transform.rotation = Quaternion.AngleAxis(-rotateAngle , m_PlayerUpVector) * m_OriginQuaternion;
+        this.transform.rotation = Quaternion.AngleAxis(-rotateAngle , this.m_playerUpVector) * this.m_originQuaternion;
     }
 
     /*
@@ -240,18 +250,28 @@ public class Player : MonoBehaviour
      */
     public bool ShotRayCastToForward(out Transform objectTransform)
     {
-        if (Physics.Raycast(m_PlayerRayVector, PlayerObject.transform.forward, out m_RaycastHit, m_MaxRaycastDistance))
+        if (this.m_isRaycastHit == true) 
         {
-            objectTransform = m_RaycastHit.transform;            
+            objectTransform = null;
+            return false;
+        }
+
+        this.m_isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.transform.lossyScale, this.transform.forward, 
+                                        out this.m_raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
+
+        if (this.m_isRaycastHit == true)
+        {
+            objectTransform = this.m_raycastHit.transform;            
             return true;
         }
+
         objectTransform = null;
         return false;
     }
 
     public bool PickUpObject(Transform objectTransform)
     {
-        if (CanPlayerPick() == false)
+        if (CanPlayerPickObject() == false)
         {
             return false;
         }
@@ -260,10 +280,10 @@ public class Player : MonoBehaviour
         objectTransform.GetComponent<CGThrowableObject>().SetObjectStatePicked();
 
         // 4. 물체를 플레이어 우측 팔 부근으로 이동시킨다. + 자식 오브젝트로 붙인다.
-        objectTransform.parent = PlayerObject.transform;
+        objectTransform.parent = this.transform;
 
         Vector3 pickUpObjectPosition = objectTransform.position;
-        pickUpObjectPosition.y += PlayerObject.transform.position.y * 0.1f;
+        pickUpObjectPosition.y += this.transform.position.y * 0.1f;
         objectTransform.position = pickUpObjectPosition;
 
         // 플레이어의 상태를 집은 상태로 변경한다.
@@ -277,13 +297,13 @@ public class Player : MonoBehaviour
         Vector3 playerThrowVector;
 
         //?? 규태 : 방향은 유저가 바라보고 있는 방향으로 변경 요망
-        playerThrowVector = (PlayerObject.transform.up + PlayerObject.transform.forward).normalized;
+        playerThrowVector = (this.transform.up + this.transform.forward).normalized;
 
         // PickUpObject가 날아갈 수 있게 상태를 만든다.
-        m_PickUpObject.GetComponent<CGThrowableObject>().SetObjectStateThrown();
+        this.m_pickUpObject.GetComponent<CGThrowableObject>().SetObjectStateThrown();
 
         // 오브젝트를 던진다.
-        PWManager.LaunchCGObject(m_PickUpObject.GetComponent<CGThrowableObject>(), playerThrowVector, throwStrength);
+        this.m_pwManager.LaunchCGObject(this.m_pickUpObject.GetComponent<CGThrowableObject>(), playerThrowVector, throwStrength);
 
         // 플레이어와 게임의 상태를 던지고 있는 상태로 변경한다.
         SetPlayerStateThrow();
@@ -291,7 +311,7 @@ public class Player : MonoBehaviour
         //?? 규태 : 다른 곳에 콜백 만들고 지우기
         SetPlayerStateIdle();
 
-        _GameManager.SetGameStateThrowing();
+        this.gameManager.SetGameStateThrowing();
     }
 }
 
