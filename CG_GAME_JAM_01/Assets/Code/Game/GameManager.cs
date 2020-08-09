@@ -99,11 +99,23 @@ public class GameManager : MonoBehaviour
 
     private void CheckTurnOver()
     {
-        if (GameTurnTime >= GameTurnLimitTime || 
-            (GameState == EGameState.GAME_STATE_THROWING && _PhysicsWorldManager.GetObservedObjectCount() == 0))
+        if (IsTurnOver() == true)
         {
             SetGameTurnOver();
         }
+    }
+
+    private bool IsTurnOver()
+    {
+        bool bResult = false;
+
+        if (GameTurnTime >= GameTurnLimitTime ||
+            (GameState == EGameState.GAME_STATE_THROWING && _PhysicsWorldManager.GetObservedObjectCount() == 0))
+        {
+            bResult = true;
+        }
+
+        return bResult;
     }
 
     /*
