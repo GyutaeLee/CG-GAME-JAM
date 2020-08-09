@@ -7,22 +7,9 @@ using UnityEngine;
  */
 public class WorldSetter : MonoBehaviour
 {
-    private GameObject m_emptyGameObjectPrefab;
-
-    private Transform m_worldSetterTransform;
-
-    private Transform m_cubeWorldTransform;
-    private GameObject m_cubeWorldGameObject;
-
-    // GUI
-    public bool PlaneDebuggingEnable = true;
-    public bool PlaneDebuggingDisplayEnable = true;
-    public bool CubeAreaDebuggingEnable = true;
-    // GUI
-
     public enum ECubeArea : uint
     {
-        XP, XM,    
+        XP, XM,
         YP, YM,
         ZP, ZM,
 
@@ -44,6 +31,27 @@ public class WorldSetter : MonoBehaviour
         XM_YM_ZP, XM_YM_ZM,
 
         NONE
+    }
+
+    // GUI
+    public bool bPlaneDebuggingDisplayEnable;
+    public bool bCubeAreaDebuggingEnable;
+    // GUI
+
+    private enum PlaneDirectionEnum : uint
+    {
+        IN = 0,
+        OUT = 1
+    }
+
+    private enum WorldAreaEnum : uint
+    {
+        XPLUS = 0,
+        XMINUS = 2,
+        YPLUS = 4,
+        YMINUS = 6,
+        ZPLUS = 8,
+        ZMINUS = 10
     }
 
     private int[,] m_areaEnumToCoordinate = new int[27, 3]
@@ -72,8 +80,28 @@ public class WorldSetter : MonoBehaviour
         { 0, 0, 0 }
     };
 
+    private GameObject m_emptyGameObjectPrefab;     // Plane GameObject 생성을 위한 Empty Prefab
+    private GameObject m_cubeWorldGameObject;       // "CubeWorld"라는 GameObject를 찾는다. 이것은 CubeWorld가 시작하는 GameObject Root가 된다.
 
-    private ECubeArea[,,] m_areaEnumLUT = new ECubeArea[3, 3, 3];
+    private Transform m_cubeWorldTransform;
+    private Transform m_worldSetterTransform;
+
+    // Area Infomation : GetCubeAreaEnum / GetCubeAreaBound methods 참조
+    private ECubeArea[,,] m_eAreaEnumLUT;
+    private Bounds[,,] m_areaBound;
+
+    // Planes : 현재 디버깅 및 Cube Area간의 충돌 탐지를 위해 사용된다.
+    private Vector3[] m_planeRelativePos;
+    private Quaternion[] m_planeRot;
+    private GameObject[] m_prefabPlaneArea;
+    private Color[] m_planeColor;
+
+    // LightingSetting : 각 Plane마다 Directional Light를 주기 위해 사용된다.
+    private GameObject[] m_worldLight;
+
+    // Cube Area Setting : 디버깅 및 각 Area Cube 공간을 나타내기 위해 사용된다.
+    private GameObject m_cubeAreaParent;
+    private GameObject[] m_cubeAreaObject;
 
     /*
      * @brief : input은 각 axis에대해 -1, 0, 1이고, 그에 따라 CubeAreaEnum을 던져준다.
@@ -81,13 +109,13 @@ public class WorldSetter : MonoBehaviour
      */
     private ECubeArea GetCubeAreaEnum(int x, int y, int z)
     {
-        return m_areaEnumLUT[x + 1, y + 1, z + 1];
+        return m_eAreaEnumLUT[x + 1, y + 1, z + 1];
     }
 
     public ECubeArea GetCubeAreaEnum(Vector3 WorldPosition)
     {
-        Vector3 cubeWorldPos = m_cubeWorldTransform.position;
-        Vector3 cubeWorldExtent = m_cubeWorldTransform.lossyScale / 2f;
+        Vector3 cubeWorldPos = this.m_cubeWorldTransform.position;
+        Vector3 cubeWorldExtent = this.m_cubeWorldTransform.lossyScale / 2f;
 
         Vector3 cubeWorldMin = cubeWorldPos - cubeWorldExtent;
         Vector3 cubeWorldMax = cubeWorldPos + cubeWorldExtent;
@@ -113,14 +141,12 @@ public class WorldSetter : MonoBehaviour
         return GetCubeAreaEnum(bx, by, bz);
     }
 
-    private Bounds[,,] m_areaBound = new Bounds[3, 3, 3];
-
     public Bounds GetCubeAreaBound(ECubeArea area)
     {
-        int x = m_areaEnumToCoordinate[(uint)area, 0];
-        int y = m_areaEnumToCoordinate[(uint)area, 1];
-        int z = m_areaEnumToCoordinate[(uint)area, 2];
-        return m_areaBound[x + 1, y + 1, z + 1];
+        int x = this.m_areaEnumToCoordinate[(uint)area, 0];
+        int y = this.m_areaEnumToCoordinate[(uint)area, 1];
+        int z = this.m_areaEnumToCoordinate[(uint)area, 2];
+        return this.m_areaBound[x + 1, y + 1, z + 1];
     }
     
     /*
@@ -142,117 +168,116 @@ public class WorldSetter : MonoBehaviour
         return false;
     }
 
-    enum PlaneDirectionEnum : uint
+    private void InitWorldSetter()
     {
-        IN = 0,
-        OUT = 1
+        this.m_eAreaEnumLUT = new ECubeArea[3, 3, 3];
+        this.m_areaBound = new Bounds[3, 3, 3];
+
+        this.m_emptyGameObjectPrefab = Resources.Load("Prefab/GameObject") as GameObject;
+
+        this.m_worldSetterTransform = GetComponent<Transform>();
+
+        this.m_cubeWorldTransform = this.transform.Find("CubeWorld");
+        this.m_cubeWorldGameObject = this.m_cubeWorldTransform.gameObject;
     }
 
-    enum WorldAreaEnum : uint
+    private void InitDebuggingPlanes()
     {
-        XPLUS = 0,
-        XMINUS = 2,
-        YPLUS = 4,
-        YMINUS = 6,
-        ZPLUS = 8,
-        ZMINUS = 10
-    }
+        this.m_planeRelativePos = new Vector3[12];
+        this.m_planeRot = new Quaternion[12];
+        this.m_prefabPlaneArea = new GameObject[12];
+        this.m_planeColor = new Color[12];
 
-    Vector3[] m_planeRelativePos = new Vector3[12];
-    Quaternion[] m_planeRot = new Quaternion[12];
-    GameObject[] m_prefabPlaneArea = new GameObject[12];
-    Color[] m_planeColor = new Color[12];
-    void initDebuggingPlanes()
-    {
         // plane pos and rot init for debugging
         const float posMove = 0.52f;
         const float planeAlphaValue = 0.3f;
-        m_planeRelativePos[(uint)WorldAreaEnum.XPLUS] = new Vector3(posMove, 0f, 0f);
-        m_planeRot[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 90f);
-        m_planeColor[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.IN] = new Color(1f, 0f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.XPLUS] = new Vector3(posMove, 0f, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 90f);
+        this.m_planeColor[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.IN] = new Color(1f, 0f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.XPLUS + 1] = new Vector3(posMove, 0f, 0f);
-        m_planeRot[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, -90f);
-        m_planeColor[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(1f, 0f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.XPLUS + 1] = new Vector3(posMove, 0f, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, -90f);
+        this.m_planeColor[(uint)WorldAreaEnum.XPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(1f, 0f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.XMINUS] = new Vector3(-posMove, 0f, 0f);
-        m_planeRot[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, -90f);
-        m_planeColor[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.IN] = new Color(1f, 0f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.XMINUS] = new Vector3(-posMove, 0f, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, -90f);
+        this.m_planeColor[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.IN] = new Color(1f, 0f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.XMINUS + 1] = new Vector3(-posMove, 0f, 0f);
-        m_planeRot[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 90f);
-        m_planeColor[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(1f, 0f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.XMINUS + 1] = new Vector3(-posMove, 0f, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 90f);
+        this.m_planeColor[(uint)WorldAreaEnum.XMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(1f, 0f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.YPLUS] = new Vector3(0f, posMove, 0f);
-        m_planeRot[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 180f);
-        m_planeColor[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 1f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.YPLUS] = new Vector3(0f, posMove, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 180f);
+        this.m_planeColor[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 1f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.YPLUS + 1] = new Vector3(0f, posMove, 0f);
-        m_planeRot[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 1f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.YPLUS + 1] = new Vector3(0f, posMove, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.YPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 1f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.YMINUS] = new Vector3(0f, -posMove, 0f);
-        m_planeRot[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 1f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.YMINUS] = new Vector3(0f, -posMove, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(0f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 1f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.YMINUS + 1] = new Vector3(0f, -posMove, 0f);
-        m_planeRot[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 180f);
-        m_planeColor[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 1f, 0f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.YMINUS + 1] = new Vector3(0f, -posMove, 0f);
+        this.m_planeRot[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(0f, 0f, 180f);
+        this.m_planeColor[(uint)WorldAreaEnum.YMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 1f, 0f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.ZPLUS] = new Vector3(0f, 0f, posMove);
-        m_planeRot[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(90f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 0f, 1f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.ZPLUS] = new Vector3(0f, 0f, posMove);
+        this.m_planeRot[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(90f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 0f, 1f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.ZPLUS + 1] = new Vector3(0f, 0f, posMove);
-        m_planeRot[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(-90f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 0f, 1f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.ZPLUS + 1] = new Vector3(0f, 0f, posMove);
+        this.m_planeRot[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(-90f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.ZPLUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 0f, 1f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.ZMINUS] = new Vector3(0f, 0, -posMove);
-        m_planeRot[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(-90f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 0f, 1f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.ZMINUS] = new Vector3(0f, 0, -posMove);
+        this.m_planeRot[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.IN] = Quaternion.Euler(-90f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.IN] = new Color(0f, 0f, 1f, planeAlphaValue);
 
-        m_planeRelativePos[(uint)WorldAreaEnum.ZMINUS + 1] = new Vector3(0f, 0f, -posMove);
-        m_planeRot[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(90f, 0f, 0f);
-        m_planeColor[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 0f, 1f, planeAlphaValue);
+        this.m_planeRelativePos[(uint)WorldAreaEnum.ZMINUS + 1] = new Vector3(0f, 0f, -posMove);
+        this.m_planeRot[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = Quaternion.Euler(90f, 0f, 0f);
+        this.m_planeColor[(uint)WorldAreaEnum.ZMINUS + (uint)PlaneDirectionEnum.OUT] = new Color(0f, 0f, 1f, planeAlphaValue);
 
         Material planeMat = Resources.Load("Prefab/PlaneTransparency") as Material;
         GameObject prefab = Resources.Load("Prefab/pAreaPlane") as GameObject;
 
-        GameObject planeParent = GameObject.Instantiate(m_emptyGameObjectPrefab, m_cubeWorldTransform);
+        GameObject planeParent = GameObject.Instantiate(this.m_emptyGameObjectPrefab, this.m_cubeWorldTransform);
         planeParent.name = "PlaneParent";
         Transform planeParentTransform = planeParent.transform;
 
         int worldBarrierLayerIndex = LayerMask.NameToLayer("CGWorldBarrier");
         for (int i = 0; i < 12; ++i)
         {
-            m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, planeParentTransform);
-            m_prefabPlaneArea[i].GetComponent<Renderer>().enabled = PlaneDebuggingDisplayEnable;
-            m_prefabPlaneArea[i].layer = worldBarrierLayerIndex;
+            this.m_prefabPlaneArea[i] = GameObject.Instantiate(prefab, planeParentTransform);
+            this.m_prefabPlaneArea[i].GetComponent<Renderer>().enabled = this.bPlaneDebuggingDisplayEnable;
+            this.m_prefabPlaneArea[i].layer = worldBarrierLayerIndex;
 
             // Basic Setting
             WorldAreaEnum ew = ((i % 2) == 0 ? (WorldAreaEnum)i : (WorldAreaEnum)(i - 1));
             PlaneDirectionEnum ep = (PlaneDirectionEnum)(i % 2);
-            m_prefabPlaneArea[i].name = ew.ToString() + '_' + ep.ToString();
-            m_prefabPlaneArea[i].transform.localPosition = m_planeRelativePos[i];
-            m_prefabPlaneArea[i].transform.localRotation = m_planeRot[i];
+            this.m_prefabPlaneArea[i].name = ew.ToString() + '_' + ep.ToString();
+            this.m_prefabPlaneArea[i].transform.localPosition = this.m_planeRelativePos[i];
+            this.m_prefabPlaneArea[i].transform.localRotation = this.m_planeRot[i];
 
             // Material Setting
-            MeshRenderer mr = m_prefabPlaneArea[i].GetComponent<MeshRenderer>();
+            MeshRenderer mr = this.m_prefabPlaneArea[i].GetComponent<MeshRenderer>();
             mr.material = Material.Instantiate(planeMat);
-            mr.material.SetColor("_Color", m_planeColor[i]);
+            mr.material.SetColor("_Color", this.m_planeColor[i]);
 
             // Plane Collider Setting for preventing from a character moving to another cube face
-            Rigidbody rb = m_prefabPlaneArea[i].AddComponent<Rigidbody>();
+            Rigidbody rb = this.m_prefabPlaneArea[i].AddComponent<Rigidbody>();
             rb.mass = 100f;
             rb.isKinematic = true;
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
-        planeParent.SetActive(PlaneDebuggingEnable);
+        planeParent.SetActive(true);
     }
-
-    GameObject[] m_worldLight = new GameObject[6];
-    void initLightSetting()
+    
+    private void InitLightSetting()
     {
+        this.m_worldLight = new GameObject[6];
+
         // Lighting Setting
         Quaternion[] lightRot = new Quaternion[6];
         lightRot[0] = Quaternion.Euler(0f, -90f, 0f);    // X+
@@ -264,22 +289,20 @@ public class WorldSetter : MonoBehaviour
 
         for (int i = 0; i < 6; ++i)
         {
-            Vector3 lPos = m_planeRelativePos[i * 2] * 500f;
-            m_worldLight[i] = GameObject.Instantiate(m_emptyGameObjectPrefab, lPos, lightRot[i], m_worldSetterTransform);
+            Vector3 lPos = this.m_planeRelativePos[i * 2] * 500f;
+            this.m_worldLight[i] = GameObject.Instantiate(this.m_emptyGameObjectPrefab, lPos, lightRot[i], this.m_worldSetterTransform);
 
             WorldAreaEnum ew = (WorldAreaEnum)(i * 2);
-            m_worldLight[i].name = ew.ToString() + "_Light";
+            this.m_worldLight[i].name = ew.ToString() + "_Light";
 
-            Light light = m_worldLight[i].AddComponent<Light>();
+            Light light = this.m_worldLight[i].AddComponent<Light>();
             light.type = LightType.Directional;
             light.intensity = 1f;
             light.shadows = LightShadows.None;
         }
     }
 
-    GameObject m_cubeAreaParent;
-    GameObject[] m_cubeAreaObject = new GameObject[26];
-    void setCubeAreaGameObject(ref GameObject go, string goName, Vector3 pos, Vector3 scale, ref Material resourceMat, Color colour)
+    private void SetCubeAreaGameObject(ref GameObject go, string goName, Vector3 pos, Vector3 scale, ref Material resourceMat, Color colour)
     {
         go.name = goName;
         go.transform.localPosition = pos;
@@ -290,170 +313,172 @@ public class WorldSetter : MonoBehaviour
         mr.material.SetColor("_Color", colour);
     }
 
-    void initCubeAreaSetting()
+    private void InitCubeAreaSetting()
     {
-        m_areaEnumLUT[0, 0, 0] = ECubeArea.XM_YM_ZM;
-        m_areaEnumLUT[0, 0, 1] = ECubeArea.XM_YM;
-        m_areaEnumLUT[0, 0, 2] = ECubeArea.XM_YM_ZP;
+        this.m_cubeAreaObject = new GameObject[26];
 
-        m_areaEnumLUT[0, 1, 0] = ECubeArea.XM_ZM;
-        m_areaEnumLUT[0, 1, 1] = ECubeArea.XM;
-        m_areaEnumLUT[0, 1, 2] = ECubeArea.XM_ZP;
+        this.m_eAreaEnumLUT[0, 0, 0] = ECubeArea.XM_YM_ZM;
+        this.m_eAreaEnumLUT[0, 0, 1] = ECubeArea.XM_YM;
+        this.m_eAreaEnumLUT[0, 0, 2] = ECubeArea.XM_YM_ZP;
 
-        m_areaEnumLUT[0, 2, 0] = ECubeArea.XM_YP_ZM;
-        m_areaEnumLUT[0, 2, 1] = ECubeArea.XM_YP;
-        m_areaEnumLUT[0, 2, 2] = ECubeArea.XM_YP_ZP;
+        this.m_eAreaEnumLUT[0, 1, 0] = ECubeArea.XM_ZM;
+        this.m_eAreaEnumLUT[0, 1, 1] = ECubeArea.XM;
+        this.m_eAreaEnumLUT[0, 1, 2] = ECubeArea.XM_ZP;
 
-        m_areaEnumLUT[1, 0, 0] = ECubeArea.YM_ZM;
-        m_areaEnumLUT[1, 0, 1] = ECubeArea.YM;
-        m_areaEnumLUT[1, 0, 2] = ECubeArea.YM_ZP;
+        this.m_eAreaEnumLUT[0, 2, 0] = ECubeArea.XM_YP_ZM;
+        this.m_eAreaEnumLUT[0, 2, 1] = ECubeArea.XM_YP;
+        this.m_eAreaEnumLUT[0, 2, 2] = ECubeArea.XM_YP_ZP;
 
-        m_areaEnumLUT[1, 1, 0] = ECubeArea.ZM;
-        m_areaEnumLUT[1, 1, 1] = ECubeArea.NONE;
-        m_areaEnumLUT[1, 1, 2] = ECubeArea.ZP;
+        this.m_eAreaEnumLUT[1, 0, 0] = ECubeArea.YM_ZM;
+        this.m_eAreaEnumLUT[1, 0, 1] = ECubeArea.YM;
+        this.m_eAreaEnumLUT[1, 0, 2] = ECubeArea.YM_ZP;
 
-        m_areaEnumLUT[1, 2, 0] = ECubeArea.YP_ZM;
-        m_areaEnumLUT[1, 2, 1] = ECubeArea.YP;
-        m_areaEnumLUT[1, 2, 2] = ECubeArea.YP_ZP;
+        this.m_eAreaEnumLUT[1, 1, 0] = ECubeArea.ZM;
+        this.m_eAreaEnumLUT[1, 1, 1] = ECubeArea.NONE;
+        this.m_eAreaEnumLUT[1, 1, 2] = ECubeArea.ZP;
 
-        m_areaEnumLUT[2, 0, 0] = ECubeArea.XP_YM_ZM;
-        m_areaEnumLUT[2, 0, 1] = ECubeArea.XP_YM;
-        m_areaEnumLUT[2, 0, 2] = ECubeArea.XP_YM_ZP;
+        this.m_eAreaEnumLUT[1, 2, 0] = ECubeArea.YP_ZM;
+        this.m_eAreaEnumLUT[1, 2, 1] = ECubeArea.YP;
+        this.m_eAreaEnumLUT[1, 2, 2] = ECubeArea.YP_ZP;
 
-        m_areaEnumLUT[2, 1, 0] = ECubeArea.XP_ZM;
-        m_areaEnumLUT[2, 1, 1] = ECubeArea.XP;
-        m_areaEnumLUT[2, 1, 2] = ECubeArea.XP_ZP;
+        this.m_eAreaEnumLUT[2, 0, 0] = ECubeArea.XP_YM_ZM;
+        this.m_eAreaEnumLUT[2, 0, 1] = ECubeArea.XP_YM;
+        this.m_eAreaEnumLUT[2, 0, 2] = ECubeArea.XP_YM_ZP;
 
-        m_areaEnumLUT[2, 2, 0] = ECubeArea.XP_YP_ZM;
-        m_areaEnumLUT[2, 2, 1] = ECubeArea.XP_YP;
-        m_areaEnumLUT[2, 2, 2] = ECubeArea.XP_YP_ZP;
+        this.m_eAreaEnumLUT[2, 1, 0] = ECubeArea.XP_ZM;
+        this.m_eAreaEnumLUT[2, 1, 1] = ECubeArea.XP;
+        this.m_eAreaEnumLUT[2, 1, 2] = ECubeArea.XP_ZP;
+
+        this.m_eAreaEnumLUT[2, 2, 0] = ECubeArea.XP_YP_ZM;
+        this.m_eAreaEnumLUT[2, 2, 1] = ECubeArea.XP_YP;
+        this.m_eAreaEnumLUT[2, 2, 2] = ECubeArea.XP_YP_ZP;
 
         const float cubeAreaAlphaValue = 0.3f;
 
         Material cubeAreaMat = Resources.Load("Prefab/CubeAreaMat") as Material;
         GameObject cubeAreaPrefab = Resources.Load("Prefab/pAreaCube") as GameObject;
 
-        m_cubeAreaParent = GameObject.Instantiate(m_emptyGameObjectPrefab, m_cubeWorldTransform);
-        m_cubeAreaParent.name = "CubeParent";
-        m_cubeAreaParent.SetActive(CubeAreaDebuggingEnable);
+        this.m_cubeAreaParent = GameObject.Instantiate(this.m_emptyGameObjectPrefab, this.m_cubeWorldTransform);
+        this.m_cubeAreaParent.name = "CubeParent";
+        this.m_cubeAreaParent.SetActive(this.bCubeAreaDebuggingEnable);
 
-        for (int i = 0; i < m_cubeAreaObject.Length; ++i)
+        for (int i = 0; i < this.m_cubeAreaObject.Length; ++i)
         {
-            m_cubeAreaObject[i] = GameObject.Instantiate(cubeAreaPrefab, m_cubeAreaParent.transform);
+            this.m_cubeAreaObject[i] = GameObject.Instantiate(cubeAreaPrefab, this.m_cubeAreaParent.transform);
         }
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP], 
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP], 
             "CubeArea_X+",
             new Vector3(1f, 0f, 0f), 
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM],
             "CubeArea_X-",
             new Vector3(-1f, 0f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YP],
             "CubeArea_Y+",
             new Vector3(0f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YM],
             "CubeArea_Y-",
             new Vector3(0f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.ZP],
             "CubeArea_Z+",
             new Vector3(0f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.ZM],
             "CubeArea_Z-",
             new Vector3(0f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YP],
             "CubeArea_X+Y+",
             new Vector3(1f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YM],
             "CubeArea_X+Y-",
             new Vector3(1f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YP],
             "CubeArea_X-Y+",
             new Vector3(-1f, 1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YM],
             "CubeArea_X-Y-",
             new Vector3(-1f, -1f, 0f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 0f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_ZP],
             "CubeArea_X+Z+",
             new Vector3(1f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_ZM],
             "CubeArea_X-Z+",
             new Vector3(1f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_ZP],
             "CubeArea_X-Z+",
             new Vector3(-1f, 0f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_ZM],
             "CubeArea_X-Z-",
             new Vector3(-1f, 0f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 0f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YP_ZP],
             "CubeArea_Y+Z+",
             new Vector3(0f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YP_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YP_ZM],
             "CubeArea_Y-Z+",
             new Vector3(0f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YM_ZP],
             "CubeArea_Y-Z+",
             new Vector3(0f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.YM_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.YM_ZM],
             "CubeArea_Y-Z-",
             new Vector3(0f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
@@ -461,68 +486,68 @@ public class WorldSetter : MonoBehaviour
             new Color(0f, 1f, 1f, cubeAreaAlphaValue));
 
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZP],
             "CubeArea_X+Y+Z+",
             new Vector3(1f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YP_ZM],
             "CubeArea_X+Y+Z-",
             new Vector3(1f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZP],
             "CubeArea_X+Y-Z+",
             new Vector3(1f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XP_YM_ZM],
             "CubeArea_X+Y-Z-",
             new Vector3(1f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZP],
             "CubeArea_X-Y+Z+",
             new Vector3(-1f, 1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YP_ZM],
             "CubeArea_X-Y+Z-",
             new Vector3(-1f, 1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZP],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZP],
             "CubeArea_X-Y-Z+",
             new Vector3(-1f, -1f, 1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
-        setCubeAreaGameObject(ref m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZM],
+        SetCubeAreaGameObject(ref this.m_cubeAreaObject[(uint)ECubeArea.XM_YM_ZM],
             "CubeArea_X-Y-Z-",
             new Vector3(-1f, -1f, -1f),
             new Vector3(1f, 1f, 1f),
             ref cubeAreaMat,
             new Color(1f, 1f, 1f, cubeAreaAlphaValue));
 
-        for (int i = 0; i < m_cubeAreaObject.Length; ++i)
+        for (int i = 0; i < this.m_cubeAreaObject.Length; ++i)
         {
             ECubeArea ae = (ECubeArea)i;
 
-            int x = m_areaEnumToCoordinate[i, 0] + 1;
-            int y = m_areaEnumToCoordinate[i, 1] + 1;
-            int z = m_areaEnumToCoordinate[i, 2] + 1;
+            int x = this.m_areaEnumToCoordinate[i, 0] + 1;
+            int y = this.m_areaEnumToCoordinate[i, 1] + 1;
+            int z = this.m_areaEnumToCoordinate[i, 2] + 1;
 
             // Get World Bound from Renderer
-            m_areaBound[x, y, z] = m_cubeAreaObject[i].GetComponent<Renderer>().bounds;
+            this.m_areaBound[x, y, z] = this.m_cubeAreaObject[i].GetComponent<Renderer>().bounds;
         }
     }
 
@@ -530,15 +555,9 @@ public class WorldSetter : MonoBehaviour
     //void Start()
     void Awake()
     {
-        m_emptyGameObjectPrefab = Resources.Load("Prefab/GameObject") as GameObject;
-
-        m_worldSetterTransform = GetComponent<Transform>();
-
-        m_cubeWorldTransform = transform.Find("CubeWorld");
-        m_cubeWorldGameObject = m_cubeWorldTransform.gameObject;
-
-        initDebuggingPlanes();
-        initLightSetting();
-        initCubeAreaSetting();
+        InitWorldSetter();
+        InitDebuggingPlanes();
+        InitLightSetting();
+        InitCubeAreaSetting();
     }
 }
