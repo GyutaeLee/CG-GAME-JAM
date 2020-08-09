@@ -38,7 +38,7 @@ public class CGThrowableObject : CGObject
     private bool IsObjectStop()
     {
         bool bResult = false;
-        const float CGEpsilon = 0.01f;
+        const float CGEpsilon = 0.1f;
 
         if (CGEpsilon >= Mathf.Abs(m_Rigidbody.velocity.x)
             && CGEpsilon >= Mathf.Abs(m_Rigidbody.velocity.y)
