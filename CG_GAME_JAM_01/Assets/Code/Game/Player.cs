@@ -242,6 +242,26 @@ public class Player : MonoBehaviour
         // 큐브 오브젝트 위치에 맞게 -90 가중치 계산
         rotateAngle -= 90.0f;
 
+#if UNITY_EDITOR
+        if (horizontalValue == -1.0f && verticalValue == 0.0f)
+        {
+            rotateAngle = 90.0f;
+        }
+        else if (horizontalValue == 1.0f && verticalValue == 0.0f)
+        {
+            rotateAngle = 270.0f;
+        }
+
+        if (horizontalValue == 0.0f && verticalValue == -1.0f)
+        {
+            rotateAngle = 180.0f;
+        }
+        else if (horizontalValue == 0.0f && verticalValue == 1.0f)
+        {
+            rotateAngle = 0.0f;
+        }
+#endif
+
         // 플레이어 오브젝트의 up 벡터를 기준으로 절대 각도 '-' (반시계방향으로 변경) 회전
         this.transform.rotation = Quaternion.AngleAxis(-rotateAngle , this.m_playerUpVector) * this.m_originQuaternion;
     }
