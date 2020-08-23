@@ -42,9 +42,8 @@ public class Player : MonoBehaviour
     private Vector3 m_playerRayPosition;
     private RaycastHit m_raycastHit;
 
-    private bool m_isRaycastHit;
-
     private float m_playerHeight;
+    private Vector3 m_maxRaycastBoxScale;
     private float m_maxRaycastDistance;
 
     private GameObject m_pickUpObject;
@@ -74,7 +73,8 @@ public class Player : MonoBehaviour
         this.m_originQuaternion = this.transform.localRotation;
 
         this.m_playerHeight = this.transform.GetComponent<CapsuleCollider>().height;
-        this.m_maxRaycastDistance = this.m_playerHeight * 0.15f;
+        this.m_maxRaycastBoxScale = this.transform.lossyScale * 0.2f;
+        this.m_maxRaycastDistance = this.m_playerHeight * 0.05f;
 
         SetPlayerDirectionVectors();
     }
@@ -89,10 +89,12 @@ public class Player : MonoBehaviour
                 this.m_moveForwardVector = Vector3.forward;
                 this.m_moveRightVector = Vector3.right;
                 break;
+
             case WorldSetter.ECubeArea.ZM:
                 this.m_moveForwardVector = Vector3.up;
                 this.m_moveRightVector = Vector3.right;
                 break;
+
             default:
                 break;
         }
@@ -100,24 +102,26 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        Vector3 rayVector = this.transform.position;
-
-        rayVector += this.m_playerUpVector * (this.m_playerHeight * 0.5f * this.transform.localScale.y);
+        Vector3 rayVector = this.GetComponent<Collider>().bounds.center;
 
         this.m_playerRayPosition = rayVector;
     }
 
+    //?? 규태 : BoxCast 찾아보기
     private void OnDrawGizmos()
     {
-        if (this.m_isRaycastHit == true)
+        RaycastHit hit;
+        bool isHit = Physics.BoxCast(this.m_playerRayPosition, this.m_maxRaycastBoxScale * 0.5f, this.transform.forward, out hit, this.transform.rotation, this.m_maxRaycastDistance);
+
+        if (isHit == true)
         {
             Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_raycastHit.distance);
-            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.transform.lossyScale);
+            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.m_maxRaycastBoxScale);
         }
         else
         {
             Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_maxRaycastDistance);
-            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_maxRaycastDistance, this.transform.lossyScale);
+            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_maxRaycastDistance, this.m_maxRaycastBoxScale);
         }
     }
 
@@ -160,8 +164,6 @@ public class Player : MonoBehaviour
             this.m_pickUpObject.transform.parent = null;
             this.m_pickUpObject = null;
         }
-
-        this.m_isRaycastHit = false;
     }
 
     public void SetPlayerStateReady()
@@ -272,16 +274,18 @@ public class Player : MonoBehaviour
     public bool ShotRayCastToForward(out Transform objectTransform)
     {
         // 이미 물체를 들고 있음
-        if (this.m_isRaycastHit == true)
+        if (this.m_ePlayerState == EPlayerState.PLAYER_STATE_PICK)
         {
             objectTransform = null;
             return false;
         }
 
-        this.m_isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.transform.lossyScale, this.transform.forward,
-                                        out this.m_raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
+        bool isRaycastHit = false;
 
-        if (this.m_isRaycastHit == true)
+        isRaycastHit = Physics.BoxCast(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.m_maxRaycastBoxScale * 0.5f, 
+                                              this.transform.forward, out this.m_raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
+
+        if (isRaycastHit == true)
         {
             objectTransform = this.m_raycastHit.transform;
             return true;
