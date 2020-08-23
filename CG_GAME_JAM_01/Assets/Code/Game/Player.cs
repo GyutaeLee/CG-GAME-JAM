@@ -74,7 +74,7 @@ public class Player : MonoBehaviour
         this.m_originQuaternion = this.transform.localRotation;
 
         this.m_playerHeight = this.transform.GetComponent<CapsuleCollider>().height;
-        this.m_maxRaycastDistance = this.m_playerHeight;
+        this.m_maxRaycastDistance = this.m_playerHeight * 0.15f;
 
         SetPlayerDirectionVectors();
     }
@@ -251,23 +251,26 @@ public class Player : MonoBehaviour
      */
     public bool ShotRayCastToForward(out Transform objectTransform)
     {
-        if (this.m_isRaycastHit == true) 
+        // 이미 물체를 들고 있음
+        if (this.m_isRaycastHit == true)
         {
             objectTransform = null;
             return false;
         }
 
-        this.m_isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.transform.lossyScale, this.transform.forward, 
+        this.m_isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.transform.lossyScale, this.transform.forward,
                                         out this.m_raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
 
         if (this.m_isRaycastHit == true)
         {
-            objectTransform = this.m_raycastHit.transform;            
+            objectTransform = this.m_raycastHit.transform;
             return true;
         }
-
-        objectTransform = null;
-        return false;
+        else
+        {
+            objectTransform = null;
+            return false;
+        }
     }
 
     public bool PickUpObject(Transform objectTransform)
