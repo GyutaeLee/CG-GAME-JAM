@@ -22,7 +22,7 @@ public class CGObject : MonoBehaviour
     {
         bool isPickable = false;
 
-        if (eObjectState == EObjectState.OBJECT_STATE_GROUND && isMovable == true)
+        if (this.eObjectState == EObjectState.OBJECT_STATE_GROUND && this.isMovable == true)
         {
             isPickable = true;
         }

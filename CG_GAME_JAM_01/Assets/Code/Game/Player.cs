@@ -29,7 +29,7 @@ public class Player : MonoBehaviour
     private GameManager m_gameManager;
     private PhysicsWorldManager m_pwManager;
     private WorldSetter m_worldSetter;
-    private Rigidbody m_rigidbody;
+    private CharacterController m_characterController;
 
     private Vector3 m_moveForwardVector;
     private Vector3 m_moveRightVector;
@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
         this.m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         this.m_pwManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
         this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
-        this.m_rigidbody = this.GetComponent<Rigidbody>();
+        this.m_characterController = GetComponent<CharacterController>();
 
         this.m_playerUpVector = this.transform.up;
         this.m_originQuaternion = this.transform.localRotation;
@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        Vector3 rayVector = this.GetComponent<Collider>().bounds.center;
+        Vector3 rayVector = this.GetComponent<CapsuleCollider>().bounds.center;
 
         this.m_playerRayPosition = rayVector;
     }
@@ -213,14 +213,21 @@ public class Player : MonoBehaviour
         if (horizontalValue == 0 && verticalValue == 0)
             return;
 
-        float horizontalSpeed = horizontalValue * this.playerMoveSpeed * Time.deltaTime;
-        float verticalSpeed   = verticalValue * this.playerMoveSpeed * Time.deltaTime;
+        float horizontalSpeed = horizontalValue * this.playerMoveSpeed;
+        float verticalSpeed   = verticalValue * this.playerMoveSpeed;
         Vector3 moveVector = Vector3.zero;
 
         moveVector += this.m_moveRightVector * horizontalSpeed;
         moveVector += this.m_moveForwardVector * verticalSpeed;
+        
+        moveVector *= Time.deltaTime;
 
-        this.m_rigidbody.AddForce(moveVector);
+        // Move Player Object
+        if (this.m_characterController.isGrounded == false)
+        {
+            this.m_characterController.Move(Physics.gravity * Time.deltaTime);
+        }
+        this.m_characterController.Move(moveVector * Time.deltaTime);
     }
 
     public void RotatePlayerObject(float horizontalValue, float verticalValue)

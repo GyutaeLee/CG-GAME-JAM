@@ -128,6 +128,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1694030298335141397, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: playerMoveSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1893034713037297008, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: playerMoveSpeed
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 2256564529122962787, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -190,3 +200,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b39c3c849f286514298a4a3a7f1d9fbd, type: 3}
+--- !u!1 &1893034713003362987 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1893034713037297011, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1893034713003362988 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1694030297511237808, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+--- !u!143 &1893034713003362989
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1893034713003362987}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.879003
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.9143525, z: 0}
+--- !u!143 &1893034713003362990
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1893034713003362988}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 1.879003
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.9143525, z: 0}
