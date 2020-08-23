@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class TestCharacterController : MonoBehaviour
 {
+    public float characterSpeed;
+
     private Transform m_transform;
     private CharacterController m_characterController;
-
-    public float characterSpeed;
 
     private void InitTestCharacterController()
     {
@@ -15,14 +15,12 @@ public class TestCharacterController : MonoBehaviour
         m_characterController = GetComponent<CharacterController>();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         InitTestCharacterController();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if(m_characterController.isGrounded == false)
         {
