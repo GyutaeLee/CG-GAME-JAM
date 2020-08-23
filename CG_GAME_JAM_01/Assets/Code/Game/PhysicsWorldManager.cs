@@ -130,6 +130,15 @@ public class PhysicsWorldManager : MonoBehaviour
         this.m_cubeAreaGravity[(uint)WorldSetter.ECubeArea.ZM] = Vector3.forward * Physics.gravity.magnitude;
     }
 
+    public Vector3 GetCubeAreaGravity(WorldSetter.ECubeArea eCubeArea)
+    {
+        Vector3 areaGravity = Vector3.zero;
+
+        areaGravity = this.m_cubeAreaGravity[(uint)eCubeArea];
+
+        return areaGravity;
+    }
+
     private void DoObjectLaunchTrigger(int objectIndex)
     {
         Vector3 launchForce = this.m_objects[objectIndex].launchDirection * this.m_objects[objectIndex].launchPower * kLaunchPower;

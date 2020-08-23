@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
         this.m_playerUpVector = this.transform.up;
         this.m_originQuaternion = this.transform.localRotation;
 
-        this.m_playerHeight = this.transform.GetComponent<CapsuleCollider>().height;
+        this.m_playerHeight = this.m_characterController.height;
         this.m_maxRaycastBoxScale = this.transform.lossyScale * 0.2f;
         this.m_maxRaycastDistance = this.m_playerHeight * 0.05f;
 
@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        Vector3 rayVector = this.GetComponent<CapsuleCollider>().bounds.center;
+        Vector3 rayVector = this.m_characterController.bounds.center;
 
         this.m_playerRayPosition = rayVector;
     }
@@ -219,15 +219,16 @@ public class Player : MonoBehaviour
 
         moveVector += this.m_moveRightVector * horizontalSpeed;
         moveVector += this.m_moveForwardVector * verticalSpeed;
-        
+
+        if (this.m_characterController.isGrounded == false)
+        {
+            moveVector += this.m_pwManager.GetCubeAreaGravity(this.m_eCubeArea);
+        }
+
         moveVector *= Time.deltaTime;
 
         // Move Player Object
-        if (this.m_characterController.isGrounded == false)
-        {
-            this.m_characterController.Move(Physics.gravity * Time.deltaTime);
-        }
-        this.m_characterController.Move(moveVector * Time.deltaTime);
+        this.m_characterController.Move(moveVector);
     }
 
     public void RotatePlayerObject(float horizontalValue, float verticalValue)
