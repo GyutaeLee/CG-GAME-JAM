@@ -26,7 +26,7 @@ public class Player : MonoBehaviour
 
     public float playerMoveSpeed;
 
-    private GameManager m_gameManager;
+    public GameManager m_gameManager;
     private PhysicsWorldManager m_pwManager;
     private WorldSetter m_worldSetter;
     private CharacterController m_characterController;
@@ -40,9 +40,10 @@ public class Player : MonoBehaviour
     private WorldSetter.ECubeArea m_eCubeArea;
 
     private Vector3 m_playerRayPosition;
-    private RaycastHit m_raycastHit;
 
     private float m_playerHeight;
+    private float m_playerGravityScale;
+
     private Vector3 m_maxRaycastBoxScale;
     private float m_maxRaycastDistance;
 
@@ -60,11 +61,10 @@ public class Player : MonoBehaviour
         UpdatePlayer();
     }
 
-    private void InitPlayer()
+    public virtual void InitPlayer()
     {
         this.gameObject.layer = LayerMask.NameToLayer("CGPlayer");
 
-        this.m_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         this.m_pwManager = GameObject.Find("PhysicsWorldManager").GetComponent<PhysicsWorldManager>();
         this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
         this.m_characterController = GetComponent<CharacterController>();
@@ -73,8 +73,10 @@ public class Player : MonoBehaviour
         this.m_originQuaternion = this.transform.localRotation;
 
         this.m_playerHeight = this.m_characterController.height;
-        this.m_maxRaycastBoxScale = this.transform.lossyScale * 0.2f;
-        this.m_maxRaycastDistance = this.m_playerHeight * 0.05f;
+        this.m_playerGravityScale = 0.25f;
+
+        this.m_maxRaycastBoxScale = this.transform.lossyScale * 1.0f;
+        this.m_maxRaycastDistance = this.m_playerHeight * 0.075f;
 
         SetPlayerDirectionVectors();
     }
@@ -102,9 +104,34 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
+        UpdatePlayerRay();
+        UpdatePlayerGrounded();
+    }
+
+    private void UpdatePlayerRay()
+    {
         Vector3 rayVector = this.m_characterController.bounds.center;
 
+        //?? 규태 : 캐릭터 변경시 가중치 보기
+        rayVector.y -= 0.15f;
+
         this.m_playerRayPosition = rayVector;
+    }
+
+    private void UpdatePlayerGrounded()
+    {
+        if (this.m_characterController.isGrounded == false)
+        {
+            Vector3 moveVector = Vector3.zero;
+
+            moveVector += this.m_pwManager.GetCubeAreaGravity(this.m_eCubeArea);
+            moveVector *= this.m_playerGravityScale;
+
+            moveVector *= Time.deltaTime;
+
+            // Move Player Object
+            this.m_characterController.Move(moveVector);
+        }
     }
 
     //?? 규태 : BoxCast 찾아보기
@@ -115,8 +142,8 @@ public class Player : MonoBehaviour
 
         if (isHit == true)
         {
-            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_raycastHit.distance);
-            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.m_maxRaycastBoxScale);
+            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * hit.distance);
+            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * hit.distance, this.m_maxRaycastBoxScale);
         }
         else
         {
@@ -220,11 +247,6 @@ public class Player : MonoBehaviour
         moveVector += this.m_moveRightVector * horizontalSpeed;
         moveVector += this.m_moveForwardVector * verticalSpeed;
 
-        if (this.m_characterController.isGrounded == false)
-        {
-            moveVector += this.m_pwManager.GetCubeAreaGravity(this.m_eCubeArea);
-        }
-
         moveVector *= Time.deltaTime;
 
         // Move Player Object
@@ -289,13 +311,14 @@ public class Player : MonoBehaviour
         }
 
         bool isRaycastHit = false;
+        RaycastHit raycastHit;
 
-        isRaycastHit = Physics.BoxCast(this.m_playerRayPosition + this.transform.forward * this.m_raycastHit.distance, this.m_maxRaycastBoxScale * 0.5f, 
-                                              this.transform.forward, out this.m_raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
+        isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.m_maxRaycastBoxScale * 0.5f, 
+                                              this.transform.forward, out raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
 
         if (isRaycastHit == true)
         {
-            objectTransform = this.m_raycastHit.transform;
+            objectTransform = raycastHit.transform;
             return true;
         }
         else
