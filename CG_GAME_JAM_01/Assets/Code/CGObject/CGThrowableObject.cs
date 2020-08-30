@@ -5,18 +5,18 @@ using UnityEngine;
 
 public class CGThrowableObject : CGObject
 {
-    private Vector3 m_OriginLocalPosition;
-    private Quaternion m_OriginLocalRotation;
-    private Vector3 m_OriginLocalScale;
+    private Vector3 m_originLocalPosition;
+    private Quaternion m_originLocalRotation;
+    private Vector3 m_originLocalScale;
 
-    private Rigidbody m_Rigidbody;
-    private Vector3 m_CubeAreaGravity;
+    private Rigidbody m_rigidbody;
+    private Vector3 m_cubeAreaGravity;
 
     private void FixedUpdate()
     {
-        if(m_CubeAreaGravity != Vector3.zero)
+        if(this.m_cubeAreaGravity != Vector3.zero)
         {
-            m_Rigidbody.AddForce(m_CubeAreaGravity * m_Rigidbody.mass * m_Rigidbody.mass);
+            this.m_rigidbody.AddForce(this.m_cubeAreaGravity * this.m_rigidbody.mass * this.m_rigidbody.mass);
         }
     }
 
@@ -38,14 +38,14 @@ public class CGThrowableObject : CGObject
     private bool IsObjectStop()
     {
         bool bResult = false;
-        const float CGEpsilon = 0.1f;
+        const float kCGEpsilon = 0.1f;
 
-        if (CGEpsilon >= Mathf.Abs(m_Rigidbody.velocity.x)
-            && CGEpsilon >= Mathf.Abs(m_Rigidbody.velocity.y)
-            && CGEpsilon >= Mathf.Abs(m_Rigidbody.velocity.z)
-            && CGEpsilon >= Mathf.Abs(m_Rigidbody.angularVelocity.x)
-            && CGEpsilon >= Mathf.Abs(m_Rigidbody.angularVelocity.y)
-            && CGEpsilon >= Mathf.Abs(m_Rigidbody.angularVelocity.z)
+        if (kCGEpsilon >= Mathf.Abs(this.m_rigidbody.velocity.x)
+            && kCGEpsilon >= Mathf.Abs(this.m_rigidbody.velocity.y)
+            && kCGEpsilon >= Mathf.Abs(this.m_rigidbody.velocity.z)
+            && kCGEpsilon >= Mathf.Abs(this.m_rigidbody.angularVelocity.x)
+            && kCGEpsilon >= Mathf.Abs(this.m_rigidbody.angularVelocity.y)
+            && kCGEpsilon >= Mathf.Abs(this.m_rigidbody.angularVelocity.z)
             )
         {
             bResult = true;
@@ -69,25 +69,25 @@ public class CGThrowableObject : CGObject
 
         isMovable = true;
 
-        m_OriginLocalPosition = transform.localPosition;
-        m_OriginLocalRotation = transform.localRotation;
-        m_OriginLocalScale = transform.localScale;
+        this.m_originLocalPosition = transform.localPosition;
+        this.m_originLocalRotation = transform.localRotation;
+        this.m_originLocalScale = transform.localScale;
 
-        m_Rigidbody = transform.GetComponent<Rigidbody>();
-        m_Rigidbody.useGravity = false;
+        this.m_rigidbody = GetComponent<Rigidbody>();
+        this.m_rigidbody.useGravity = false;
         
-        m_Rigidbody.mass = 0.3f;
-        m_Rigidbody.drag = 1.0f;
-        m_Rigidbody.angularDrag = 1.0f;
+        this.m_rigidbody.mass = 0.3f;
+        this.m_rigidbody.drag = 1.0f;
+        this.m_rigidbody.angularDrag = 1.0f;
 
-        m_CubeAreaGravity = Vector3.zero;
+        this.m_cubeAreaGravity = Vector3.zero;
     }
 
     public void ResetObject()
     {
-        transform.localPosition = m_OriginLocalPosition;
-        transform.localRotation = m_OriginLocalRotation;
-        transform.localScale = m_OriginLocalScale;
+        transform.localPosition = this.m_originLocalPosition;
+        transform.localRotation = this.m_originLocalRotation;
+        transform.localScale = this.m_originLocalScale;
 
         SetObjectStateGround();
     }
@@ -111,9 +111,9 @@ public class CGThrowableObject : CGObject
         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
-        m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        this.m_rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
-        m_CubeAreaGravity = Vector3.zero;
+        this.m_cubeAreaGravity = Vector3.zero;
     }
 
     public void SetObjectStatePicked()
@@ -125,7 +125,7 @@ public class CGThrowableObject : CGObject
     {
         eObjectState = EObjectState.OBJECT_STATE_THROWN;
 
-        m_Rigidbody.constraints = RigidbodyConstraints.None;
+        this.m_rigidbody.constraints = RigidbodyConstraints.None;
         transform.parent = null;
     }
 
@@ -136,6 +136,6 @@ public class CGThrowableObject : CGObject
 
     public void SetCubeAreaGravity(Vector3 v)
     {
-        m_CubeAreaGravity = v;
+        this.m_cubeAreaGravity = v;
     }
 }

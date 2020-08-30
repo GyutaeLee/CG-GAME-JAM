@@ -76,7 +76,7 @@ public class Player : MonoBehaviour
         this.m_playerGravityScale = 0.25f;
 
         this.m_overlapBoxCenter = new Vector3(0.0f, 0.0f, 0.0f);
-        this.m_overlapBoxHalfExtent = new Vector3(0.05f, 0.05f, 0.05f);
+        this.m_overlapBoxHalfExtent = new Vector3(0.05f, 0.1f, 0.05f);
 
         SetPlayerDirectionVectors();
     }

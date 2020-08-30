@@ -121,6 +121,26 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &932648472 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1893034713037297011, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+    type: 3}
+  m_PrefabInstance: {fileID: 1893034713003362986}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &932648477
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932648472}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.16
+  m_Height: 1.64
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &1175624125 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1893034713387181846, guid: b39c3c849f286514298a4a3a7f1d9fbd,
@@ -140,16 +160,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1033516234919049553, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1694030298335141397, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: m_gameManager
       value: 
       objectReference: {fileID: 1175624125}
+    - target: {fileID: 1893034713003362989, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1893034713003362989, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_Height
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1893034713003362989, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_StepOffset
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1893034713003362990, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1893034713037297008, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: m_gameManager
       value: 
       objectReference: {fileID: 1175624125}
+    - target: {fileID: 1893034713037297012, guid: b39c3c849f286514298a4a3a7f1d9fbd,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.831
+      objectReference: {fileID: 0}
     - target: {fileID: 2256564529122962787, guid: b39c3c849f286514298a4a3a7f1d9fbd,
         type: 3}
       propertyPath: m_LocalPosition.x
