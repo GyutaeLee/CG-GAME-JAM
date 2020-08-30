@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private const int kAreaCount = 6;
+    private readonly Vector3 kOverlapBoxForwardOffset = new Vector3(0.0f, 0.2f, 0.2f); // Player Position에서 얼만큼 앞에 Overlap Box를 둘 지 (y, z값으로 위치 조절)
 
     public enum EPlayerState
     {
@@ -39,13 +40,11 @@ public class Player : MonoBehaviour
 
     private WorldSetter.ECubeArea m_eCubeArea;
 
-    private Vector3 m_playerRayPosition;
-
     private float m_playerHeight;
     private float m_playerGravityScale;
 
-    private Vector3 m_maxRaycastBoxScale;
-    private float m_maxRaycastDistance;
+    private Vector3 m_overlapBoxCenter;  
+    private Vector3 m_overlapBoxHalfExtent;     // Overlap Box의 Half Extent
 
     private GameObject m_pickUpObject;
 
@@ -69,14 +68,15 @@ public class Player : MonoBehaviour
         this.m_worldSetter = GameObject.Find("WorldSetter").GetComponent<WorldSetter>();
         this.m_characterController = GetComponent<CharacterController>();
 
+        // @Chan : upVector도 eCubeArea에 따라 설정되게 해야하지 않을까? 예를들어 Cube아래에 있는 캐릭터의 up vector가 전혀 다를거라서.
         this.m_playerUpVector = this.transform.up;
         this.m_originQuaternion = this.transform.localRotation;
 
         this.m_playerHeight = this.m_characterController.height;
         this.m_playerGravityScale = 0.25f;
 
-        this.m_maxRaycastBoxScale = this.transform.lossyScale * 1.0f;
-        this.m_maxRaycastDistance = this.m_playerHeight * 0.075f;
+        this.m_overlapBoxCenter = new Vector3(0.0f, 0.0f, 0.0f);
+        this.m_overlapBoxHalfExtent = new Vector3(0.05f, 0.05f, 0.05f);
 
         SetPlayerDirectionVectors();
     }
@@ -104,18 +104,13 @@ public class Player : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        UpdatePlayerRay();
+        UpdateOverlapBoxCenter();
         UpdatePlayerGrounded();
     }
 
-    private void UpdatePlayerRay()
+    private void UpdateOverlapBoxCenter()
     {
-        Vector3 rayVector = this.m_characterController.bounds.center;
-
-        //?? 규태 : 캐릭터 변경시 가중치 보기
-        rayVector.y -= 0.15f;
-
-        this.m_playerRayPosition = rayVector;
+        this.m_overlapBoxCenter = this.transform.position + this.transform.localRotation * kOverlapBoxForwardOffset;
     }
 
     private void UpdatePlayerGrounded()
@@ -134,22 +129,18 @@ public class Player : MonoBehaviour
         }
     }
 
-    //?? 규태 : BoxCast 찾아보기
     private void OnDrawGizmos()
     {
-        RaycastHit hit;
-        bool isHit = Physics.BoxCast(this.m_playerRayPosition, this.m_maxRaycastBoxScale * 0.5f, this.transform.forward, out hit, this.transform.rotation, this.m_maxRaycastDistance);
+        Collider[] colliders = Physics.OverlapBox(this.m_overlapBoxCenter, this.m_overlapBoxHalfExtent, Quaternion.identity);
+        bool isHit = colliders.Length > 0 ? true : false;
 
         if (isHit == true)
         {
-            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * hit.distance);
-            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * hit.distance, this.m_maxRaycastBoxScale);
+            Gizmos.color = Color.red;
         }
-        else
-        {
-            Gizmos.DrawRay(this.m_playerRayPosition, this.transform.forward * this.m_maxRaycastDistance);
-            Gizmos.DrawWireCube(this.m_playerRayPosition + this.transform.forward * this.m_maxRaycastDistance, this.m_maxRaycastBoxScale);
-        }
+
+        Gizmos.DrawWireCube(this.m_overlapBoxCenter, this.m_overlapBoxHalfExtent * 2);
+        Gizmos.color = Color.white;
     }
 
     private float AddQuadrantValue(float x, float y)
@@ -310,15 +301,26 @@ public class Player : MonoBehaviour
             return false;
         }
 
-        bool isRaycastHit = false;
-        RaycastHit raycastHit;
+        Collider[] colliders = Physics.OverlapBox(this.m_overlapBoxCenter, this.m_overlapBoxHalfExtent, Quaternion.identity);
+        bool isHit = colliders.Length > 0 ? true : false;
 
-        isRaycastHit = Physics.BoxCast(this.m_playerRayPosition, this.m_maxRaycastBoxScale * 0.5f, 
-                                              this.transform.forward, out raycastHit, this.transform.rotation, this.m_maxRaycastDistance);
-
-        if (isRaycastHit == true)
+        if (isHit == true)
         {
-            objectTransform = raycastHit.transform;
+            int closestColliderIndex = 0;
+            float minSquaredLen = float.MaxValue;
+            for(int i = 0; i < colliders.Length; ++i)
+            {
+                Vector3 distVec = colliders[i].bounds.center - this.m_overlapBoxCenter;
+                float distSquaredLen = Vector3.Dot(distVec, distVec);
+
+                if(distSquaredLen < minSquaredLen)
+                {
+                    minSquaredLen = distSquaredLen;
+                    closestColliderIndex = i;
+                }
+            }
+            
+            objectTransform = colliders[closestColliderIndex].transform;
             return true;
         }
         else
