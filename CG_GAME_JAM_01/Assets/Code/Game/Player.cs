@@ -18,15 +18,29 @@ public class Player : MonoBehaviour
         MAX_PLAYER_STATE,
     }
 
+    public enum EPlayerView
+    {
+        PLAYER_VIEW_NONE    = 0,
+
+        PLAYER_VIEW_THIRD_VIEW,
+        PLAYER_VIEW_WORLD_VIEW,
+
+        MAX_PLAYER_VIEW,
+    }
+
+
     public EPlayerState PlayerState
     { 
         get { return this.m_ePlayerState; }
-        set { this.m_ePlayerState = value; }
+    }
+
+    public EPlayerView PlayerView
+    {
+        get { return this.m_ePlayerView; }
     }
 
     public float playerMoveSpeed;
 
-    public GameManager m_gameManager;
     private PhysicsWorldManager m_pwManager;
     private WorldSetter m_worldSetter;
     private CharacterController m_characterController;
@@ -50,6 +64,7 @@ public class Player : MonoBehaviour
     private GameObject m_pickUpObject;
 
     private EPlayerState m_ePlayerState;
+    private EPlayerView m_ePlayerView;
 
     private void Start()
     {
@@ -212,6 +227,16 @@ public class Player : MonoBehaviour
         this.m_pickUpObject = null;
     }
 
+    public void SetPlayerViewThirdView()
+    {
+        this.m_ePlayerView = EPlayerView.PLAYER_VIEW_THIRD_VIEW;
+    }
+
+    public void SetPlayerViewWorldView()
+    {
+        this.m_ePlayerView = EPlayerView.PLAYER_VIEW_WORLD_VIEW;
+    }
+
     public bool CanPlayerPickObject()
     {
         if (this.m_ePlayerState != EPlayerState.PLAYER_STATE_READY)
@@ -235,17 +260,25 @@ public class Player : MonoBehaviour
     /*
      *  PLAYER CONTROL
      */
-    public void MovePlayerObject(float horizontalValue, float verticalValue)    
+    public void MovePlayerObject(float horizontalValue, float verticalValue)
     {
         if (horizontalValue == 0 && verticalValue == 0)
             return;
 
         float horizontalSpeed = horizontalValue * this.playerMoveSpeed;
-        float verticalSpeed   = verticalValue * this.playerMoveSpeed;
+        float verticalSpeed = verticalValue * this.playerMoveSpeed;
         Vector3 moveVector = Vector3.zero;
 
-        moveVector += this.m_moveRightVector * horizontalSpeed;
-        moveVector += this.m_moveForwardVector * verticalSpeed;
+        if (this.m_ePlayerView == EPlayerView.PLAYER_VIEW_THIRD_VIEW)
+        {
+            moveVector += transform.forward * verticalSpeed;
+            moveVector += transform.right * horizontalSpeed;
+        }
+        else if (this.m_ePlayerView == EPlayerView.PLAYER_VIEW_WORLD_VIEW)
+        {
+            moveVector += this.m_moveRightVector * horizontalSpeed;
+            moveVector += this.m_moveForwardVector * verticalSpeed;
+        }
 
         moveVector *= Time.deltaTime;
 
@@ -369,7 +402,7 @@ public class Player : MonoBehaviour
 
         //?? 규태 : 다른 곳에 콜백 만들고 지우기
         SetPlayerStateIdle();
-        this.m_gameManager.SetGameStateThrowing();
+        //this.m_gameManager.SetGameStateThrowing();
     }
 }
 
