@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
         this.gameCurrentTurn = 0;
         this.gameCurrentTurnTime = 0.0f;
 
-        this.playerArray[this.gameCurrentTurn].PlayerState = Player.EPlayerState.PLAYER_STATE_READY;
+        this.playerArray[this.gameCurrentTurn].SetPlayerStateReady();
         this.playerController[this.gameCurrentTurn].SetActive(true);
     }
 

@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class GuiPlayerMoveController : Joystick
 {
-    //?? 규태 : 추후에 각 플레이어에 맞게 불러오자
     public Player player;
-        
+
     public override void KeyboardDownFunction()
     {
+#if UNITY_EDITOR
         float horizontalValue = 0.0f;
         float verticalValue = 0.0f;
 
-#if UNITY_EDITOR
         if (Input.GetKey(KeyCode.W))
         {
             verticalValue = 1.0f;
