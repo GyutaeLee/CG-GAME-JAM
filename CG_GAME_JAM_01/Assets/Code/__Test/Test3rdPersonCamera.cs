@@ -5,6 +5,7 @@ using UnityEngine;
 public class Test3rdPersonCamera : MonoBehaviour
 {
     public float cameraWallOffset;
+    public Vector3 zoom;
 
     private GameObject m_camTarget;
     private Transform m_camTargetTransform;
@@ -16,7 +17,7 @@ public class Test3rdPersonCamera : MonoBehaviour
 
     // Y component : 카메라가 캐릭터에 얼만큼 위에 있어야 하는지
     // Z component : 카메라가 캐릭터에 뒤로 얼만큼 뒤에 있어야 하는지
-    private Vector3 m_zoom;
+    private Vector3 m_forwardOffset;
 
     private void InitTest3rdPersonCamera()
     {
@@ -29,9 +30,8 @@ public class Test3rdPersonCamera : MonoBehaviour
         maxTargetScale = Mathf.Max(maxTargetScale, this.m_camTargetTransform.localScale.z);
 
         this.m_zoomBackLimit = maxTargetScale;
-        this.m_zoom.x = 0.0f;
-        this.m_zoom.y = 3.0f;
-        this.m_zoom.z = -5.0f;
+
+        this.m_forwardOffset = new Vector3(0f, 0f, 1f);
     }
 
     private void Start()
@@ -126,13 +126,16 @@ public class Test3rdPersonCamera : MonoBehaviour
 
         // 현재 rotation에 따라, zoom을 정해진 위치에서 하게 끔 하기 위해,
         // 기존 zoom을 회전시키고
-        Vector3 rotatedZoom = this.m_camTransform.localRotation * m_zoom;
+        Vector3 rotatedZoom = this.m_camTransform.localRotation * zoom;
+        Vector3 rotatedForward = this.m_camTransform.localRotation * this.m_forwardOffset;
 
         // 그것으로 카메라 position을 조정한다.
         this.m_camTransform.position += rotatedZoom;
 
+        Vector3 targetPosition = this.m_camTargetTransform.position + rotatedForward;
+
         // 그리고 camera가 target 바라보도록 한다.
-        this.m_camTransform.rotation = Quaternion.LookRotation((this.m_camTargetTransform.position - this.m_camTransform.position), Vector3.up);
+        this.m_camTransform.rotation = Quaternion.LookRotation(targetPosition - this.m_camTransform.position, Vector3.up);
 
         // 그리고 현재 그 카메라가 부딪히는지를 보고 collision을 해결한다.
         bool isPositionChange = false;
@@ -141,7 +144,7 @@ public class Test3rdPersonCamera : MonoBehaviour
         // 만약 Collision을 처리하면서 position이 바뀌었다면, rotation도 다시 설정해준다.
         if(isPositionChange == true)
         {
-            this.m_camTransform.rotation = Quaternion.LookRotation((this.m_camTargetTransform.position - this.m_camTransform.position), Vector3.up);
+            this.m_camTransform.rotation = Quaternion.LookRotation((targetPosition - this.m_camTransform.position), Vector3.up);
         }
     }
 }
