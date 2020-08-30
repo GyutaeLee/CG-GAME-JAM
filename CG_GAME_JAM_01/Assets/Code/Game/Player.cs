@@ -2,10 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EPlayerView
+{
+    PLAYER_VIEW_NONE = 0,
+
+    PLAYER_VIEW_THIRD_VIEW,
+    PLAYER_VIEW_WORLD_VIEW,
+
+    MAX_PLAYER_VIEW,
+
+}
+
 public class Player : MonoBehaviour
 {
     private const int kAreaCount = 6;
-    private readonly Vector3 kOverlapBoxForwardOffset = new Vector3(0.0f, 0.2f, 0.2f); // Player Position에서 얼만큼 앞에 Overlap Box를 둘 지 (y, z값으로 위치 조절)
+    private const float kStagePlayerRotateSpeed = 100.0f;
+    private readonly Vector3 kOverlapBoxForwardOffset = new Vector3(0.0f, 0.0f, 0.2f); // Player Position에서 얼만큼 앞에 Overlap Box를 둘 지 (y, z값으로 위치 조절)
 
     public enum EPlayerState
     {
@@ -18,17 +30,6 @@ public class Player : MonoBehaviour
 
         MAX_PLAYER_STATE,
     }
-
-    public enum EPlayerView
-    {
-        PLAYER_VIEW_NONE    = 0,
-
-        PLAYER_VIEW_THIRD_VIEW,
-        PLAYER_VIEW_WORLD_VIEW,
-
-        MAX_PLAYER_VIEW,
-    }
-
 
     public EPlayerState PlayerState
     { 
@@ -158,7 +159,7 @@ public class Player : MonoBehaviour
         Gizmos.color = Color.white;
     }
 
-    private float AddQuadrantValue(float x, float y)
+    protected float AddQuadrantValue(float x, float y)
     {
         float quadrantValue = 0.0f;
 
@@ -228,6 +229,18 @@ public class Player : MonoBehaviour
         this.m_ePlayerView = EPlayerView.PLAYER_VIEW_WORLD_VIEW;
     }
 
+    public void TogglePlayerView()
+    {
+        if (this.m_ePlayerView == EPlayerView.PLAYER_VIEW_THIRD_VIEW)
+        {
+            this.m_ePlayerView = EPlayerView.PLAYER_VIEW_WORLD_VIEW;
+        }
+        else if (this.m_ePlayerView == EPlayerView.PLAYER_VIEW_WORLD_VIEW)
+        {
+            this.m_ePlayerView = EPlayerView.PLAYER_VIEW_THIRD_VIEW;
+        }
+    }
+
     public bool CanPlayerPickObject()
     {
         if (this.m_ePlayerState != EPlayerState.PLAYER_STATE_READY)
@@ -251,7 +264,7 @@ public class Player : MonoBehaviour
     /*
      *  PLAYER CONTROL
      */
-    public void MovePlayerObject(float horizontalValue, float verticalValue)
+    public virtual void MovePlayerObject(float horizontalValue, float verticalValue)
     {
         if (horizontalValue == 0 && verticalValue == 0)
             return;
@@ -277,49 +290,63 @@ public class Player : MonoBehaviour
         this.m_characterController.Move(moveVector);
     }
 
-    public void RotatePlayerObject(float horizontalValue, float verticalValue)
+    public virtual void RotatePlayerObject(float horizontalValue, float verticalValue)
     {
         if (horizontalValue == 0 && verticalValue == 0)
             return;
 
-        float rotateAngle = 0.0f;
-
-        // 조이스틱 degree 계산
-        if (horizontalValue != 0)
+        if (this.PlayerView == EPlayerView.PLAYER_VIEW_THIRD_VIEW)
         {
-            rotateAngle = Mathf.Atan(verticalValue / horizontalValue);
+            float rotateValue = horizontalValue;
+
+            if (verticalValue < 0)
+            {
+                rotateValue *= -1;
+            }
+
+            this.transform.Rotate(this.transform.up, rotateValue * kStagePlayerRotateSpeed * Time.deltaTime);
         }
+        else if (this.PlayerView == EPlayerView.PLAYER_VIEW_WORLD_VIEW)
+        {
+            float rotateAngle = 0.0f;
 
-        rotateAngle *= (float)(180.0f / Mathf.PI);
+            // 조이스틱 degree 계산
+            if (horizontalValue != 0)
+            {
+                rotateAngle = Mathf.Atan(verticalValue / horizontalValue);
+            }
 
-        // 탄젠트 주기에 따른 가중치 계산
-        rotateAngle += AddQuadrantValue(horizontalValue, verticalValue);
+            rotateAngle *= (float)(180.0f / Mathf.PI);
 
-        // 큐브 오브젝트 위치에 맞게 -90 가중치 계산
-        rotateAngle -= 90.0f;
+            // 탄젠트 주기에 따른 가중치 계산
+            rotateAngle += AddQuadrantValue(horizontalValue, verticalValue);
+
+            // 큐브 오브젝트 위치에 맞게 -90 가중치 계산
+            rotateAngle -= 90.0f;
 
 #if UNITY_EDITOR
-        if (horizontalValue == -1.0f && verticalValue == 0.0f)
-        {
-            rotateAngle = 90.0f;
-        }
-        else if (horizontalValue == 1.0f && verticalValue == 0.0f)
-        {
-            rotateAngle = 270.0f;
-        }
+            if (horizontalValue == -1.0f && verticalValue == 0.0f)
+            {
+                rotateAngle = 90.0f;
+            }
+            else if (horizontalValue == 1.0f && verticalValue == 0.0f)
+            {
+                rotateAngle = 270.0f;
+            }
 
-        if (horizontalValue == 0.0f && verticalValue == -1.0f)
-        {
-            rotateAngle = 180.0f;
-        }
-        else if (horizontalValue == 0.0f && verticalValue == 1.0f)
-        {
-            rotateAngle = 0.0f;
-        }
+            if (horizontalValue == 0.0f && verticalValue == -1.0f)
+            {
+                rotateAngle = 180.0f;
+            }
+            else if (horizontalValue == 0.0f && verticalValue == 1.0f)
+            {
+                rotateAngle = 0.0f;
+            }
 #endif
 
-        // 플레이어 오브젝트의 up 벡터를 기준으로 절대 각도 '-' (반시계방향으로 변경) 회전
-        this.transform.rotation = Quaternion.AngleAxis(-rotateAngle , this.m_playerUpVector) * this.m_originQuaternion;
+            // 플레이어 오브젝트의 up 벡터를 기준으로 절대 각도 '-' (반시계방향으로 변경) 회전
+            this.transform.rotation = Quaternion.AngleAxis(-rotateAngle, this.m_playerUpVector) * this.m_originQuaternion;
+        }
     }
 
     /*
@@ -386,7 +413,7 @@ public class Player : MonoBehaviour
         return true;
     }
 
-    public void ThrowObject(float throwStrength)
+    public virtual void ThrowObject(float throwStrength)
     {
         Vector3 playerThrowVector;
 
@@ -401,10 +428,6 @@ public class Player : MonoBehaviour
 
         // 플레이어와 게임의 상태를 던지고 있는 상태로 변경한다.
         SetPlayerStateThrow();
-
-        //?? 규태 : 다른 곳에 콜백 만들고 지우기
-        SetPlayerStateIdle();
-        //this.m_gameManager.SetGameStateThrowing();
     }
 }
 
